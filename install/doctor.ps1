@@ -22,7 +22,7 @@ param(
     [switch]$Json
 )
 $ErrorActionPreference = 'Continue'
-$KitVersion = '1.4.1'
+$KitVersion = '1.4.2'
 $CloudDoctorUrl = 'https://raw.githubusercontent.com/Wz2-z/dsh-codespaces-kit/main/install/cloud-doctor.sh'
 try { [Console]::OutputEncoding = [Text.Encoding]::UTF8 } catch {}
 try { $OutputEncoding = [Text.Encoding]::UTF8 } catch {}
@@ -214,15 +214,42 @@ if ($NoTunnel) {
 
 # ---------------------------------------------------------------- 桌面启动器
 $desktop = [Environment]::GetFolderPath('Desktop')
-$wanted = @('DeepSeek Harness', '更新 dsh')
-$found = @($wanted | Where-Object { Test-Exists (Join-Path $desktop "$_.lnk") })
-$extra = @('dsh 同步') | Where-Object { Test-Exists (Join-Path $desktop "$_.lnk") }
-if ($found.Count -eq $wanted.Count) {
-    $detail = "桌面有 $($found -join ' / ')"
-    if ($extra.Count) { $detail += " / $($extra -join ' / ')" }
-    Add-Check 'Launcher' 'ok' $detail
-} elseif ($found.Count -gt 0) {
-    Add-Check 'Launcher' 'warn' "只有 $($found -join ' / ')，缺 $(($wanted | Where-Object { $_ -notin $found }) -join ' / ')"
+# 启动入口必须有；维护入口可以是"更新 dsh"，也可以是合并后的"dsh 管理台"
+$startNames = @('DeepSeek Harness')
+$maintNames = @('dsh 管理台', '更新 dsh')
+$optNames = @('dsh 同步', 'dsh 体检')
+$foundStart = @($startNames | Where-Object { Test-Exists (Join-Path $desktop "$_.lnk") })
+$foundMaint = @($maintNames | Where-Object { Test-Exists (Join-Path $desktop "$_.lnk") })
+$foundOpt = @($optNames | Where-Object { Test-Exists (Join-Path $desktop "$_.lnk") })
+$present = @($foundStart + $foundMaint + $foundOpt)
+
+# 快捷方式指向的 .bat 还在不在（挪过目录就会断）
+$broken = @()
+if ($present.Count -gt 0) {
+    try {
+        $shell = New-Object -ComObject WScript.Shell
+        foreach ($name in $present) {
+            try {
+                $target = $shell.CreateShortcut((Join-Path $desktop "$name.lnk")).TargetPath
+                if ($target -and -not (Test-Exists $target)) { $broken += "$name → $target" }
+            } catch {
+                # 读不出来就当没坏
+            }
+        }
+    } catch {
+        # 没有 COM 也不影响其它检查
+    }
+}
+
+if ($broken.Count -gt 0) {
+    Add-Check 'Launcher' 'warn' "快捷方式指向的文件不在了：$($broken -join '；')"
+} elseif ($foundStart.Count -gt 0 -and $foundMaint.Count -gt 0) {
+    Add-Check 'Launcher' 'ok' "桌面有 $($present -join ' / ')"
+} elseif ($present.Count -gt 0) {
+    $missing = @()
+    if ($foundStart.Count -eq 0) { $missing += 'DeepSeek Harness' }
+    if ($foundMaint.Count -eq 0) { $missing += '维护入口（dsh 管理台 或 更新 dsh）' }
+    Add-Check 'Launcher' 'warn' "有 $($present -join ' / ')，缺 $($missing -join '、')"
 } else {
     Add-Check 'Launcher' 'fail' '桌面没有启动器（跑 install/setup.ps1 生成）'
 }

@@ -3,6 +3,15 @@
 版本号规则：`MAJOR.MINOR.PATCH`（[语义化版本](https://semver.org/lang/zh-CN/)）。
 发新版时改三处：本文件、[`VERSION`](VERSION)、`install/setup.ps1` 与 `install/setup.sh` 里的 `KIT_VERSION`。
 
+## [1.4.2] - 2026-09-29
+
+`doctor` 的 Launcher 那一项太死板：只认 `更新 dsh.lnk`，所以把「更新 / 同步 / 体检」
+合并成一个「dsh 管理台」之后，它报 *只有 DeepSeek Harness，缺 更新 dsh*。
+
+- 启动入口仍必须有；维护入口改成 **`dsh 管理台` 或 `更新 dsh` 任一即可**
+  （`dsh 同步` / `dsh 体检` 算可选项）
+- 新增：解析每个快捷方式的 `TargetPath`，**指向的 .bat 不在了就报 warn**（挪过目录会撞上）
+
 ## [1.4.1] - 2026-09-29
 
 Windows 启动器上的两个真实事故（都在用的时候撞出来的）：
