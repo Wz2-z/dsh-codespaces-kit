@@ -1,0 +1,10 @@
+# dsh-sync-panel bundle patch: ONE row, and nothing else in the profile.
+#
+# A loader row that fails to activate can break the "configurable entries" view
+# that other plugins' settings forms bind to, so keep this file to a single row.
+#
+# Optional tunables (validated by the Host half; unknown keys are logged and
+# ignored): dir, workspace, timeoutMs, logLines.
+- insert:
+    - id: sync-panel
+      name: 'dsh-sync-panel'

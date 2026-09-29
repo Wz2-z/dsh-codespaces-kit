@@ -1,0 +1,33 @@
+{
+  "name": "dsh-sync-panel",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "自动同步面板：显示同步模式、待提交文件、最近一次同步与日志，并能暂停/恢复/立即提交/切换模式。",
+  "icon": "./icon.svg",
+  "meta": {
+    "title": "自动同步面板（Sync Panel）",
+    "description": "侧边栏底部的同步按钮：自动同步模式、待提交文件、最近提交与日志，附暂停/恢复/立即提交/切换模式按钮。"
+  },
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "icon.svg"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true
+    }
+  },
+  "author": "Wz2-z (https://github.com/Wz2-z)"
+}
