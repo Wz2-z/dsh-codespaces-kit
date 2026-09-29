@@ -3,6 +3,18 @@
 版本号规则：`MAJOR.MINOR.PATCH`（[语义化版本](https://semver.org/lang/zh-CN/)）。
 发新版时改三处：本文件、[`VERSION`](VERSION)、`install/setup.ps1` 与 `install/setup.sh` 里的 `KIT_VERSION`。
 
+## [1.1.1] - 2026-09-29
+
+一个真机跑出来的安装器问题 + 一个顺手升级问题。
+
+- **不再"顺手升级" dsh**：原来只按 PATH 判断有没有装过，而 Codespaces 里 dsh 常常在
+  `~/.nvm/versions/node/v22.x.y/bin/`，非交互 SSH 的 PATH 里没有它 —— 结果安装器又装了一份新版。
+  现在优先**沿用正在运行的那个 dsh 的运行时**，其次在常见 nvm 前缀里找已装好的，
+  真的没有才安装。实测：从"又装了一个 0.2.0-rc.2"变成"沿用它原来的 0.1.7-rc.2"。
+- **deploy key 能自动登记了**：非交互 SSH 会话里 `gh` 没登录，登记必然失败。
+  现在会从 `/workspaces/.codespaces/shared/.env` 读 Codespace 自带的平台令牌，
+  只 export 到环境变量（不打印、不落盘）后调用 API；仍然失败才提示你手动加。
+
 ## [1.1.0] - 2026-09-29
 
 自动同步从"每 5 分钟一个 `auto sync`"改成**智能批量**。

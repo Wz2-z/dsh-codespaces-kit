@@ -66,6 +66,15 @@ GH_BIN=""
 if command -v gh >/dev/null 2>&1; then
   GH_BIN="$(command -v gh)"
   ok "已经装好：$(gh --version 2>/dev/null | head -1)"
+  if ! "$GH_BIN" auth status >/dev/null 2>&1 && [ -r /workspaces/.codespaces/shared/.env ]; then
+    # 非交互 SSH 里没有 GH_TOKEN：从 Codespaces 自己的 .env 取平台令牌（只 export，不打印）
+    GH_PLATFORM_TOKEN="$(grep -m1 '^GITHUB_TOKEN=' /workspaces/.codespaces/shared/.env 2>/dev/null | cut -d= -f2- | tr -d '"' | tr -d "\r")"
+    if [ -n "${GH_PLATFORM_TOKEN:-}" ]; then
+      export GH_TOKEN="$GH_PLATFORM_TOKEN"
+      "$GH_BIN" auth status >/dev/null 2>&1 && ok "用 Codespace 自带平台令牌做了 gh 认证（用来登记 deploy key）"
+    fi
+  fi
+  "$GH_BIN" auth status >/dev/null 2>&1 || warn "gh 没登录：deploy key 要手动登记（最后会给命令）"
 else
   warn "没找到 gh —— 云端同步不依赖它，只是没法自动登记 deploy key"
   info "python/node 环境都还能继续，最后会给你手动登记的步骤"
@@ -138,11 +147,32 @@ NODE_BIN_DIR="$(dirname "$(command -v node 2>/dev/null || echo /usr/bin/node)")"
 
 # -----------------------------------------------------------------------------
 step "安装 dsh"
-if [ -x "$NODE_BIN_DIR/dsh" ]; then
-  ok "已经装好：$("$NODE_BIN_DIR/dsh" --version 2>/dev/null || echo '版本未知')"
-elif command -v dsh >/dev/null 2>&1; then
-  NODE_BIN_DIR="$(dirname "$(command -v dsh)")"
-  ok "已经装好：$(dsh --version 2>/dev/null || echo '版本未知')"
+node_dir_ok() {
+  [ -x "$1/node" ] || return 1
+  [ "$("$1/node" -v 2>/dev/null | sed 's/^v//; s/\..*//')" -ge 22 ] 2>/dev/null
+}
+DSH_DIR=""
+# 1) 已经在跑 dsh 的话，就沿用它的运行时（避免"顺手升级"）
+RUN_PID="$(ss -ltnp 2>/dev/null | grep ':3080' | grep -o 'pid=[0-9]*' | head -1 | cut -d= -f2)"
+if [ -n "$RUN_PID" ]; then
+  RUN_EXE="$(readlink -f "/proc/$RUN_PID/exe" 2>/dev/null)"
+  if [ -n "$RUN_EXE" ] && [ -x "$(dirname "$RUN_EXE")/dsh" ] && node_dir_ok "$(dirname "$RUN_EXE")"; then
+    DSH_DIR="$(dirname "$RUN_EXE")"
+    ok "沿用正在运行的那个 dsh 运行时"
+  fi
+fi
+# 2) 否则在常见 nvm 前缀里找已经装好的（Codespaces 的 nvm 可能在 /usr/local/share/nvm）
+if [ -z "$DSH_DIR" ]; then
+  for cand in "$HOME/.nvm/versions/node"/*/bin "$HOME/nvm/current/bin" /usr/local/share/nvm/versions/node/*/bin "$NODE_BIN_DIR"; do
+    [ -x "$cand/dsh" ] || continue
+    node_dir_ok "$cand" || continue
+    DSH_DIR="$cand"
+    break
+  done
+fi
+if [ -n "$DSH_DIR" ]; then
+  NODE_BIN_DIR="$DSH_DIR"
+  ok "已经装好：$("$DSH_DIR/dsh" --version 2>/dev/null || echo '版本未知')（运行时 $NODE_BIN_DIR）"
 else
   info "npm install -g @deepseek-ai/dsh"
   run "$NODE_BIN_DIR/npm" install -g @deepseek-ai/dsh </dev/null || fail "dsh 安装失败，看上面的 npm 报错"
@@ -190,33 +220,47 @@ else
   fi
   PUB_KEY="$(cat "$DEPLOY_KEY.pub" 2>/dev/null || echo '')"
 
-  if [ -n "$GH_BIN" ]; then
-    OLD_ID="$("$GH_BIN" api "/repos/$REPO_SLUG/keys" --jq ".[] | select(.title==\"$KEY_TITLE\") | .id" 2>/dev/null | head -1)"
-    if [ -n "$OLD_ID" ]; then
-      info "先删掉同名旧 key（容器重建后它通常已经失效）"
-      run "$GH_BIN" api -X DELETE "/repos/$REPO_SLUG/keys/$OLD_ID" </dev/null || warn "删旧 key 失败，继续"
-    fi
-    if run "$GH_BIN" api -X POST "/repos/$REPO_SLUG/keys" \
-         -f "title=$KEY_TITLE" -f "key=$PUB_KEY" -F read_only=false </dev/null; then
-      ok "已登记到仓库 $REPO_SLUG 的 Deploy keys"
-    else
-      warn "自动登记失败（可能没有 administration 权限），下面这行请手动加到 Settings → Deploy keys（勾 Allow write access）："
-      printf '\n%s\n\n' "$PUB_KEY"
-    fi
-  else
-    warn "没有 gh，跳过自动登记。手动加到 Settings → Deploy keys（勾 Allow write access）："
-    printf '\n%s\n\n' "$PUB_KEY"
-  fi
-
   # 让工作区固定用这把 key（不影响容器里其它 git 仓库）
   if [ "$DRY_RUN" = 0 ]; then
     git -C "$WORKSPACE_DIR" config core.sshCommand \
       "ssh -i $DEPLOY_KEY -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new"
   fi
-  if git -C "$WORKSPACE_DIR" ls-remote origin "refs/heads/$BRANCH" >/dev/null 2>&1; then
-    ok "用这把 key 能读写仓库"
+
+  key_works() { git -C "$WORKSPACE_DIR" ls-remote origin "refs/heads/$BRANCH" >/dev/null 2>&1; }
+
+  if [ "$DRY_RUN" = 0 ] && key_works; then
+    ok "这把 key 已经能读写仓库（不用重新登记）"
   else
-    warn "用这把 key 连仓库失败（key 没登记？）—— 同步会退回用平台令牌，不影响使用"
+    REGISTERED=0
+    if [ -n "$GH_BIN" ]; then
+      OLD_ID="$("$GH_BIN" api "/repos/$REPO_SLUG/keys" --jq ".[] | select(.title==\"$KEY_TITLE\") | .id" 2>/dev/null | head -1)"
+      case "$OLD_ID" in
+        ''|*[!0-9]*) OLD_ID="" ;;   # 403 之类的错误信息不是 id，忽略
+      esac
+      if [ -n "$OLD_ID" ]; then
+        info "先删掉同名旧 key（容器重建后它通常已经失效）"
+        run "$GH_BIN" api -X DELETE "/repos/$REPO_SLUG/keys/$OLD_ID" </dev/null || warn "删旧 key 失败，继续"
+      fi
+      if run "$GH_BIN" api -X POST "/repos/$REPO_SLUG/keys" \
+           -f "title=$KEY_TITLE" -f "key=$PUB_KEY" -F read_only=false </dev/null; then
+        REGISTERED=1
+        ok "已登记到仓库 $REPO_SLUG 的 Deploy keys"
+      fi
+    fi
+    if [ "$REGISTERED" = 0 ]; then
+      if [ "$DRY_RUN" = 1 ] && [ -n "$GH_BIN" ]; then
+        info "(dry-run) 会试着登记 deploy key"
+      else
+        warn "自动登记没成功：Codespaces 自带的令牌管不了 Deploy keys（需要你本人的令牌或手动加）"
+        info "如果这把 key 以前登记过、现在还能用，就什么都不用做；否则把这行公钥加到"
+        info "Settings → Deploy keys（勾 Allow write access）："
+        printf '\n%s\n\n' "$PUB_KEY"
+      fi
+    fi
+  fi
+  if [ "$DRY_RUN" = 0 ]; then
+    key_works && ok "用这把 key 能读写仓库" \
+      || warn "用这把 key 连仓库失败 —— 同步会退回用平台令牌，不影响使用"
   fi
 fi
 
