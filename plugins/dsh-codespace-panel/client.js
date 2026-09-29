@@ -92,6 +92,37 @@ window.__ModuleLoader__.load({
       hwFree: '可用 {value}',
       hwHours: '{hours} 小时',
       hwMinutes: '{minutes} 分钟',
+      cardTitle: 'Codespace',
+      cardCreds: '凭据 {source}',
+      csBusy: '有操作进行中',
+      specMachine: '机器',
+      specStorage: '存储',
+      hwCoresSuffix: '核',
+      quotaTitle: '本月额度',
+      btnStart: '启动',
+      btnStop: '停止',
+      btnRestart: '重启',
+      btnRebuild: '重建',
+      actConfirm: '确认',
+      actCancel: '取消',
+      actWorking: '执行中…',
+      actFailed: '操作失败',
+      actStartDisabled: '已经在运行（这个面板只在运行时才能打开）',
+      actStartRequested: '已请求启动',
+      actStopRequested: '已请求停止，Codespace 正在关闭——这个页面随时会断开',
+      actRestartRequested: '已请求重启：停止 → {seconds} 秒后尝试启动；若启动没赶上，请到 github.com/codespaces 点 Start',
+      actRestartConfirm: '重启 = 先停止再启动',
+      actRestartWhy: '容器一停，DSH 和这个页面就一起结束，因此内部只能发出「停止」，并在 {seconds} 秒后补一次启动请求；没成功就在 github.com/codespaces 点 Start。',
+      actRebuildHint: 'Rebuild Container 没有 REST 接口（gh 走的是容器自己的 gRPC 通道），所以这里打开编辑器，用命令面板执行「Codespaces: Rebuild Container」',
+      actStopping: '正在停止…',
+      syncNever: '尚未刷新',
+      syncNow: '刚刚刷新',
+      syncAgo: '{seconds} 秒前刷新',
+      syncAgoMin: '{minutes} 分钟前刷新',
+      uptimeLine: '运行 {duration}',
+      gitClean: 'Git ✓ 干净',
+      gitDirty: 'Git ● 有未提交改动',
+      gitUnpushed: '有未推送提交',
     }
 
     const en = {
@@ -160,6 +191,37 @@ window.__ModuleLoader__.load({
       hwFree: '{value} free',
       hwHours: '{hours} h',
       hwMinutes: '{minutes} min',
+      cardTitle: 'Codespace',
+      cardCreds: 'credentials {source}',
+      csBusy: 'operation in progress',
+      specMachine: 'Machine',
+      specStorage: 'Storage',
+      hwCoresSuffix: 'cores',
+      quotaTitle: 'This month',
+      btnStart: 'Start',
+      btnStop: 'Stop',
+      btnRestart: 'Restart',
+      btnRebuild: 'Rebuild',
+      actConfirm: 'Confirm',
+      actCancel: 'Cancel',
+      actWorking: 'Working…',
+      actFailed: 'Action failed',
+      actStartDisabled: 'Already running (this panel only exists while it runs)',
+      actStartRequested: 'Start requested',
+      actStopRequested: 'Stop requested — the codespace is shutting down and this page will drop',
+      actRestartRequested: 'Restart requested: stop → start attempt in {seconds}s; if that one misses, start it from github.com/codespaces',
+      actRestartConfirm: 'Restart = stop, then start again',
+      actRestartWhy: 'Stopping ends DSH and this page with it, so from inside we can only ask for the stop and queue one start attempt {seconds}s later; if it misses, press Start on github.com/codespaces.',
+      actRebuildHint: 'Rebuild Container has no REST endpoint (gh reaches it over the codespace gRPC channel), so this opens the editor where the command palette runs it',
+      actStopping: 'Stopping…',
+      syncNever: 'not refreshed yet',
+      syncNow: 'refreshed just now',
+      syncAgo: 'refreshed {seconds}s ago',
+      syncAgoMin: 'refreshed {minutes}m ago',
+      uptimeLine: 'up {duration}',
+      gitClean: 'Git ✓ clean',
+      gitDirty: 'Git ● uncommitted changes',
+      gitUnpushed: 'unpushed commits',
     }
 
     /* ----------------------------------------------------------------- style */
@@ -226,6 +288,20 @@ window.__ModuleLoader__.load({
 .csq-hw-bar{flex:1 1 auto;min-width:40px;position:relative;height:6px;border-radius:999px;background:var(--dsw-alias-bg-layer-2);overflow:hidden;align-self:center}
 .csq-hw-pct{flex:none;min-width:3.2em;text-align:right;font-variant-numeric:tabular-nums}
 .csq-hw-note{margin-top:6px;font-size:11px;line-height:1.6;color:var(--dsw-alias-label-secondary)}
+.csq-card{border-top:0;margin-top:0;padding-top:0}
+.csq-status{display:flex;align-items:center;gap:6px;margin:2px 0 8px;font-size:13px}
+.csq-state-dot{width:8px;height:8px;border-radius:50%;flex:none;background:var(--dsw-alias-state-idle-primary)}
+.csq-state-dot[data-state="ok"]{background:var(--dsw-alias-state-success-primary)}
+.csq-state{font-weight:600;color:var(--dsw-alias-label-primary)}
+.csq-specs{display:flex;flex-wrap:wrap;gap:4px 14px;margin-bottom:8px;font-size:11px;color:var(--dsw-alias-label-secondary)}
+.csq-specs i{font-style:normal;color:var(--dsw-alias-label-tertiary)}
+.csq-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
+.csq-act{display:flex;align-items:center;justify-content:center;height:30px;padding:0 10px;border:1px solid var(--dsw-alias-border-l2);border-radius:8px;background:var(--dsw-alias-bg-layer-2);color:var(--dsw-alias-label-primary);cursor:pointer;font:inherit;font-size:12px;text-decoration:none;box-sizing:border-box}
+.csq-act:hover:not(:disabled){border-color:var(--dsw-alias-brand-primary)}
+.csq-act:disabled{opacity:.45;cursor:default}
+.csq-act-danger{color:var(--dsw-alias-state-error-primary);border-color:var(--dsw-alias-state-error-primary)}
+.csq-card-foot{margin-top:10px;padding-top:8px;border-top:1px solid var(--dsw-alias-border-l1)}
+.csq-ver{font-size:11px;color:var(--dsw-alias-label-tertiary);font-variant-numeric:tabular-nums}
 `
 
     function installStyle() {
@@ -351,6 +427,8 @@ window.__ModuleLoader__.load({
     /** ~4 minutes of history at the 5s poll: enough to see a build spike. */
     const HISTORY_LIMIT = 48
     const RESOURCES_REFRESH_MS = 5000
+    /** How long the restart action waits before asking GitHub to start again. */
+    const RESTART_START_DELAY_MS = 20000
 
     const resStore = createStore({
       status: 'idle',
@@ -608,118 +686,29 @@ window.__ModuleLoader__.load({
       )
     }
 
-    /**
-     * This codespace's live hardware use: memory and CPU from its own cgroup,
-     * disk from the workspace volume. Sampling needs Host code the running
-     * process may not have loaded yet, so an unrouted call says exactly that.
-     */
-    function ResourcesSection(props) {
-      const t = props.t
-      const snapshot = useStore(resStore)
-      const value = snapshot.value
+    /* ------------------------------------------------------------ card pieces */
 
-      const header = (right) =>
-        h(
-          'div',
-          { className: 'csq-sub', style: { marginBottom: 6 } },
-          h('span', null, t('hwTitle')),
-          h('span', { className: 'csq-spacer' }),
-          right ?? null,
-        )
-
-      if (value === null) {
-        const error = snapshot.error ?? {}
-        const unrouted = error.code === 'not-json' || error.status === 404
-        return h(
-          'div',
-          { className: 'csq-section' },
-          header(null),
-          unrouted
-            ? h('div', { className: 'csq-warn' }, t('hwNeedRestart'))
-            : snapshot.status === 'error'
-              ? h('div', { className: 'csq-error' }, error.message ?? t('hwFailed'))
-              : h('div', { className: 'csq-line' }, t('hwSampling')),
-        )
-      }
-
-      const memory = value.memory ?? {}
-      const cpu = value.cpu ?? {}
-      const disk = value.disk
-      const rows = [
-        {
-          label: t('hwMemory'),
-          percent: memory.percent,
-          detail: `${formatBytes(memory.usedBytes)} / ${formatBytes(memory.totalBytes)}`,
-        },
-        {
-          label: t('hwCpu'),
-          percent: cpu.percent,
-          detail: t('hwCores', { cores: cpu.cores ?? value.cores ?? '?' }),
-        },
-        disk === null || disk === undefined
-          ? null
-          : {
-              label: t('hwDisk'),
-              percent: disk.percent,
-              detail: `${formatBytes(disk.usedBytes)} / ${formatBytes(disk.totalBytes)}`,
-            },
-      ].filter(Boolean)
-
-      const extras = []
-      if (memory.peakBytes) extras.push(t('hwPeak', { value: formatBytes(memory.peakBytes) }))
-      if (Array.isArray(cpu.loadAverage) && cpu.loadAverage.length >= 3) {
-        extras.push(
-          t('hwLoad', {
-            a: cpu.loadAverage[0].toFixed(2),
-            b: cpu.loadAverage[1].toFixed(2),
-            c: cpu.loadAverage[2].toFixed(2),
-          }),
-        )
-      }
-      if (disk !== null && disk !== undefined) extras.push(t('hwFree', { value: formatBytes(disk.freeBytes) }))
-      if (value.processes !== null && value.processes !== undefined) {
-        extras.push(t('hwProcesses', { count: value.processes }))
-      }
-      extras.push(t('hwUptime', { hours: formatUptime(t, value.uptimeSeconds) }))
-      const pressure = value.pressure ?? {}
-      const contended = (pressure.cpu ?? 0) >= 10 || (pressure.memory ?? 0) >= 10
-
+    /** One labeled bar row: name, value, bar, percent. */
+    function UsageRow(props) {
       return h(
         'div',
-        { className: 'csq-section' },
-        header(null),
-        h(Sparkline, {
-          series: [
-            { points: snapshot.history.memory, color: 'var(--dsw-alias-state-success-primary)' },
-            { points: snapshot.history.cpu, color: 'var(--dsw-alias-brand-primary)' },
-          ],
-        }),
-        rows.map((row) =>
-          h(
-            'div',
-            { className: 'csq-hw-row', key: row.label },
-            h('span', { className: 'csq-hw-name' }, row.label),
-            h('b', null, row.detail),
-            h(
-              'span',
-              { className: 'csq-hw-bar' },
-              h('span', {
-                className: 'csq-fill',
-                'data-level': levelOf(row.percent),
-                style: { width: `${fillWidth(row.percent)}%` },
-              }),
-            ),
-            h('span', { className: 'csq-hw-pct' }, row.percent === null || row.percent === undefined ? '—' : `${row.percent}%`),
-          ),
+        { className: 'csq-hw-row' },
+        h('span', { className: 'csq-hw-name' }, props.label),
+        h('b', null, props.value),
+        h(
+          'span',
+          { className: 'csq-hw-bar' },
+          h('span', {
+            className: 'csq-fill',
+            'data-level': levelOf(props.percent),
+            style: { width: `${fillWidth(props.percent)}%` },
+          }),
         ),
-        h('div', { className: 'csq-hw-note' }, extras.join(' · ')),
-        contended
-          ? h(
-              'div',
-              { className: 'csq-warn' },
-              t('hwPressure', { cpu: pressure.cpu ?? 0, mem: pressure.memory ?? 0 }),
-            )
-          : null,
+        h(
+          'span',
+          { className: 'csq-hw-pct' },
+          props.percent === null || props.percent === undefined ? '—' : `${props.percent}%`,
+        ),
       )
     }
 
@@ -757,134 +746,302 @@ window.__ModuleLoader__.load({
       )
     }
 
-    /**
-     * The codespace this page runs in, plus the one destructive action: stopping
-     * it. Kept separate from the quota body because it works without any user
-     * token — the platform's own codespace credential is enough.
-     */
-    function CodespaceSection(props) {
+    /** Live hardware rows — memory, CPU, disk — or why they are unavailable. */
+    function UsageRows(props) {
       const t = props.t
-      const snapshot = useStore(csStore)
-      const [confirming, setConfirming] = React.useState(false)
-      const [busy, setBusy] = React.useState(false)
-      const [outcome, setOutcome] = React.useState(null)
+      const snapshot = useStore(resStore)
       const value = snapshot.value
-      const canStop = value !== null && value.running === true && value.pendingOperation !== true
 
-      const submit = () => {
-        if (busy) return
-        setBusy(true)
-        setOutcome(null)
-        stopCodespace()
-          .then((payload) => {
-            if (payload.ok !== true) {
-              setOutcome({ kind: 'error', text: payload.error?.message ?? t('csFailed') })
-              return
-            }
-            setConfirming(false)
-            setOutcome({ kind: 'ok', text: t('csStopped') })
-            csStore.set({ value: { ...value, state: 'ShuttingDown', stateLabel: t('csStopping'), running: false } })
-          })
-          .catch((error) => setOutcome({ kind: 'error', text: error?.message ?? String(error) }))
-          .finally(() => setBusy(false))
+      if (value === null) {
+        const error = snapshot.error ?? {}
+        const unrouted = error.code === 'not-json' || error.status === 404
+        return h(
+          'div',
+          { className: unrouted ? 'csq-warn' : snapshot.status === 'error' ? 'csq-error' : 'csq-line' },
+          unrouted ? t('hwNeedRestart') : snapshot.status === 'error' ? error.message ?? t('hwFailed') : t('hwSampling'),
+        )
       }
 
-      const lines = []
-      if (value !== null) {
-        lines.push(['csq-mono', value.name])
-        if (value.machine !== '') lines.push([null, value.machine])
-        if (value.idleTimeoutMinutes !== null) lines.push([null, t('csIdle', { minutes: value.idleTimeoutMinutes })])
-        if (value.repository !== '') lines.push([null, t('csRepo', { repo: value.repository })])
-        if (value.lastUsedAt !== '') {
-          lines.push([null, t('csLastUsed', { time: new Date(value.lastUsedAt).toLocaleString() })])
-        }
+      const memory = value.memory ?? {}
+      const cpu = value.cpu ?? {}
+      const disk = value.disk
+      const rows = [
+        {
+          label: t('hwMemory'),
+          percent: memory.percent,
+          value: `${formatBytes(memory.usedBytes)} / ${formatBytes(memory.totalBytes)}`,
+        },
+        { label: t('hwCpu'), percent: cpu.percent, value: t('hwCores', { cores: cpu.cores ?? value.cores ?? '?' }) },
+        disk === null || disk === undefined
+          ? null
+          : {
+              label: t('hwDisk'),
+              percent: disk.percent,
+              value: `${formatBytes(disk.usedBytes)} / ${formatBytes(disk.totalBytes)}`,
+            },
+      ].filter(Boolean)
+
+      const extras = []
+      if (memory.peakBytes) extras.push(t('hwPeak', { value: formatBytes(memory.peakBytes) }))
+      if (Array.isArray(cpu.loadAverage) && cpu.loadAverage.length >= 3) {
+        extras.push(
+          t('hwLoad', {
+            a: cpu.loadAverage[0].toFixed(2),
+            b: cpu.loadAverage[1].toFixed(2),
+            c: cpu.loadAverage[2].toFixed(2),
+          }),
+        )
+      }
+      if (disk !== null && disk !== undefined) extras.push(t('hwFree', { value: formatBytes(disk.freeBytes) }))
+      const pressure = value.pressure ?? {}
+      const contended = (pressure.cpu ?? 0) >= 10 || (pressure.memory ?? 0) >= 10
+
+      return h(
+        'div',
+        null,
+        h(Sparkline, {
+          series: [
+            { points: snapshot.history.memory, color: 'var(--dsw-alias-state-success-primary)' },
+            { points: snapshot.history.cpu, color: 'var(--dsw-alias-brand-primary)' },
+          ],
+        }),
+        rows.map((row) => h(UsageRow, { key: row.label, label: row.label, value: row.value, percent: row.percent })),
+        h('div', { className: 'csq-hw-note' }, extras.join(' · ')),
+        contended
+          ? h('div', { className: 'csq-warn' }, t('hwPressure', { cpu: pressure.cpu ?? 0, mem: pressure.memory ?? 0 }))
+          : null,
+      )
+    }
+
+    /** Quota, codespace state and one hardware sample, refreshed together. */
+    function refreshAll() {
+      load({ force: true })
+      loadCodespace()
+      loadResources()
+    }
+
+    /** A ticking clock, so "12 秒前" stays true while the panel is open. */
+    function useTick(intervalMs) {
+      const [now, setNow] = React.useState(() => Date.now())
+      React.useEffect(() => {
+        const timer = setInterval(() => setNow(Date.now()), intervalMs)
+        return () => clearInterval(timer)
+      }, [intervalMs])
+      return now
+    }
+
+    function relativeAge(t, at, now) {
+      if (at === 0) return t('syncNever')
+      const seconds = Math.max(0, Math.round((now - at) / 1000))
+      if (seconds <= 2) return t('syncNow')
+      if (seconds < 60) return t('syncAgo', { seconds })
+      return t('syncAgoMin', { minutes: Math.round(seconds / 60) })
+    }
+
+    /** The git line of the card footer, straight from the Codespaces API. */
+    function GitLine(props) {
+      const t = props.t
+      const git = props.git
+      if (git === null || git === undefined) return null
+      const clean = git.uncommitted !== true
+      return h(
+        'div',
+        { className: 'csq-line' },
+        h('span', { className: clean ? 'csq-ok' : 'csq-warn' }, clean ? t('gitClean') : t('gitDirty')),
+        git.unpushed === true ? h('span', { className: 'csq-warn' }, ` · ${t('gitUnpushed')}`) : null,
+        git.ref ? h('span', null, ` · ${git.ref}`) : null,
+      )
+    }
+
+    function ActionButton(props) {
+      const t = props.t
+      return h(
+        'button',
+        {
+          type: 'button',
+          className: props.danger === true ? 'csq-act csq-act-danger' : 'csq-act',
+          disabled: props.disabled === true || props.busy === true,
+          title: props.title,
+          onClick: props.onClick,
+        },
+        props.busy === true ? t('actWorking') : props.label,
+      )
+    }
+
+    /**
+     * The codespace card: state, machine spec, live hardware use, the actions
+     * that can work from inside the container, and the freshness/git footer.
+     * Start and Stop are the Codespaces REST actions; Rebuild has no REST
+     * endpoint at all (gh reaches it over the codespace's own gRPC channel), so
+     * that cell opens the editor where the command palette can run it.
+     */
+    function CodespaceCard(props) {
+      const t = props.t
+      const cs = useStore(csStore)
+      const res = useStore(resStore)
+      const now = useTick(1000)
+      const [pending, setPending] = React.useState(null)
+      const [confirming, setConfirming] = React.useState(null)
+      const [outcome, setOutcome] = React.useState(null)
+      const value = cs.value
+      const usage = res.value
+      const running = value !== null && value.running === true
+      const stopped = value !== null && value.state === 'Shutdown'
+
+      const run = (action) => {
+        if (pending !== null) return
+        setPending(action)
+        setOutcome(null)
+        request('POST', `/${action}`)
+          .then((payload) => {
+            if (payload.ok !== true) {
+              setOutcome({ kind: 'error', text: payload.error?.message ?? t('actFailed') })
+              return
+            }
+            setConfirming(null)
+            const seconds = Math.round((payload.data?.scheduledStartMs ?? 0) / 1000)
+            setOutcome({
+              kind: 'ok',
+              text:
+                action === 'stop'
+                  ? t('actStopRequested')
+                  : action === 'restart'
+                    ? t('actRestartRequested', { seconds })
+                    : t('actStartRequested'),
+            })
+            if (action !== 'start' && value !== null) {
+              csStore.set({ value: { ...value, running: false, stateLabel: t('actStopping') } })
+            }
+            loadCodespace()
+          })
+          .catch((error) => setOutcome({ kind: 'error', text: error?.message ?? String(error) }))
+          .finally(() => setPending(null))
       }
 
       return h(
         'div',
-        { className: 'csq-section' },
+        { className: 'csq-section csq-card' },
         h(
           'div',
           { className: 'csq-sub', style: { marginBottom: 6 } },
-          h('span', null, t('csTitle')),
-          value === null ? null : h('span', { className: 'csq-badge' }, value.stateLabel ?? ''),
+          h('span', null, t('cardTitle')),
           h('span', { className: 'csq-spacer' }),
-          value !== null && value.webUrl !== ''
-            ? h(
-                'a',
-                { className: 'csq-link', href: value.webUrl, target: '_blank', rel: 'noreferrer noopener' },
-                t('csOpen'),
-              )
-            : null,
+          value !== null && value.credentials ? h('span', { className: 'csq-badge' }, t('cardCreds', { source: value.credentials })) : null,
         ),
-
-        value === null
-          ? snapshot.status === 'error'
-            ? h(
-                'div',
+        h(
+          'div',
+          { className: 'csq-status' },
+          value === null
+            ? cs.status === 'error'
+              ? h('span', { className: 'csq-error' }, cs.error?.message ?? t('csUnavailable'))
+              : h('span', { className: 'csq-line' }, t('csLoading'))
+            : h(
+                React.Fragment,
                 null,
-                h('div', { className: 'csq-error' }, snapshot.error?.message ?? t('csUnavailable')),
-                snapshot.error?.detail === undefined ? null : h('div', { className: 'csq-line' }, snapshot.error.detail),
-                h(
-                  'div',
-                  { className: 'csq-row' },
-                  h('button', { type: 'button', className: 'csq-btn', onClick: () => loadCodespace() }, t('csRetry')),
-                ),
-              )
-            : h('div', { className: 'csq-line' }, t('csLoading'))
+                h('span', { className: 'csq-state-dot', 'data-state': running ? 'ok' : 'idle', 'aria-hidden': 'true' }),
+                h('span', { className: 'csq-state' }, value.stateLabel ?? ''),
+                value.pendingOperation === true ? h('span', { className: 'csq-badge' }, t('csBusy')) : null,
+              ),
+        ),
+        value === null
+          ? null
           : h(
               'div',
-              null,
-              lines.map(([className, text], index) =>
-                h('div', { className: className === null ? 'csq-line' : `csq-line ${className}`, key: index }, text),
+              { className: 'csq-specs' },
+              h('span', null, h('i', null, t('specMachine')), ` ${value.machineCores ?? '?'} ${t('hwCoresSuffix')} · ${formatBytes(value.memoryBytes)}`),
+              h('span', null, h('i', null, t('specStorage')), ` ${formatBytes(value.storageBytes)}`),
+            ),
+        h(UsageRows, { t }),
+        value === null
+          ? null
+          : h(
+              'div',
+              { className: 'csq-actions' },
+              h(ActionButton, {
+                t,
+                label: t('btnStart'),
+                disabled: !stopped,
+                busy: pending === 'start',
+                title: stopped ? undefined : t('actStartDisabled'),
+                onClick: () => run('start'),
+              }),
+              h(ActionButton, {
+                t,
+                label: t('btnStop'),
+                danger: true,
+                disabled: !running,
+                busy: pending === 'stop',
+                onClick: () => setConfirming('stop'),
+              }),
+              h(ActionButton, {
+                t,
+                label: t('btnRestart'),
+                disabled: !running,
+                busy: pending === 'restart',
+                onClick: () => setConfirming('restart'),
+              }),
+              h(
+                'a',
+                {
+                  className: 'csq-act',
+                  href: value.webUrl !== '' ? value.webUrl : 'https://github.com/codespaces',
+                  target: '_blank',
+                  rel: 'noreferrer noopener',
+                  title: t('actRebuildHint'),
+                },
+                t('btnRebuild'),
               ),
             ),
-
-        outcome === null
+        confirming === null
           ? null
-          : h('div', { className: outcome.kind === 'ok' ? 'csq-ok' : 'csq-error', style: { marginTop: 6 } }, outcome.text),
-
-        value !== null && value.pendingOperation === true
-          ? h('div', { className: 'csq-line', style: { marginTop: 6 } }, t('csPending'))
-          : null,
-
-        canStop
-          ? confirming
-            ? h(
+          : h(
+              'div',
+              { className: 'csq-confirm' },
+              h(
                 'div',
-                { className: 'csq-confirm' },
-                h('div', { className: 'csq-line' }, h('b', null, t('csConfirm', { name: value.name }))),
-                h('div', { className: 'csq-line' }, t('csStopWhy')),
-                h(
-                  'div',
-                  { className: 'csq-row' },
-                  h(
-                    'button',
-                    { type: 'button', className: 'csq-btn csq-btn-danger', disabled: busy, onClick: submit },
-                    busy ? t('csStopping') : t('csConfirmYes'),
-                  ),
-                  h(
-                    'button',
-                    {
-                      type: 'button',
-                      className: 'csq-btn',
-                      disabled: busy,
-                      onClick: () => setConfirming(false),
-                    },
-                    t('csCancel'),
-                  ),
-                ),
-              )
-            : h(
+                { className: 'csq-line' },
+                h('b', null, confirming === 'stop' ? t('actStopConfirm', { name: value?.name ?? '' }) : t('actRestartConfirm')),
+              ),
+              h(
+                'div',
+                { className: 'csq-line' },
+                confirming === 'stop' ? t('csStopWhy') : t('actRestartWhy', { seconds: Math.round(RESTART_START_DELAY_MS / 1000) }),
+              ),
+              h(
                 'div',
                 { className: 'csq-row' },
                 h(
                   'button',
-                  { type: 'button', className: 'csq-btn csq-btn-danger', onClick: () => setConfirming(true) },
-                  t('csStop'),
+                  {
+                    type: 'button',
+                    className: 'csq-btn csq-btn-danger',
+                    disabled: pending !== null,
+                    onClick: () => run(confirming),
+                  },
+                  pending !== null ? t('actWorking') : t('actConfirm'),
                 ),
-              )
-          : null,
+                h(
+                  'button',
+                  { type: 'button', className: 'csq-btn', disabled: pending !== null, onClick: () => setConfirming(null) },
+                  t('actCancel'),
+                ),
+              ),
+            ),
+        outcome === null
+          ? null
+          : h('div', { className: outcome.kind === 'ok' ? 'csq-ok' : 'csq-error', style: { marginTop: 6 } }, outcome.text),
+        h(
+          'div',
+          { className: 'csq-card-foot' },
+          h(
+            'div',
+            { className: 'csq-line' },
+            h('span', null, relativeAge(t, cs.at, now)),
+            usage === null ? null : h('span', null, ` · ${t('hwProcesses', { count: usage.processes ?? 0 })}`),
+            usage === null ? null : h('span', null, ` · ${t('uptimeLine', { duration: formatUptime(t, usage.uptimeSeconds) })}`),
+          ),
+          h(GitLine, { t, git: value?.git }),
+        ),
       )
     }
 
@@ -1008,6 +1165,7 @@ window.__ModuleLoader__.load({
             'div',
             { className: 'csq-head' },
             h('h2', null, t('title')),
+            panelVersion === '' ? null : h('span', { className: 'csq-ver' }, `v${panelVersion}`),
             h(
               'button',
               {
@@ -1016,7 +1174,7 @@ window.__ModuleLoader__.load({
                 title: t('refresh'),
                 'aria-label': t('refresh'),
                 disabled: snapshot.status === 'loading' || snapshot.status === 'refreshing',
-                onClick: () => load({ force: true }),
+                onClick: () => refreshAll(),
               },
               h(
                 'svg',
@@ -1047,9 +1205,17 @@ window.__ModuleLoader__.load({
           h(
             'div',
             { className: 'csq-body' },
-            h(Body, { t, snapshot }),
-            h(ResourcesSection, { t }),
-            h(CodespaceSection, { t }),
+            h(CodespaceCard, { t }),
+            h(
+              'div',
+              { className: 'csq-section' },
+              h(
+                'div',
+                { className: 'csq-sub', style: { marginBottom: 6 } },
+                h('span', null, t('quotaTitle')),
+              ),
+              h(Body, { t, snapshot }),
+            ),
           ),
         ),
       )
