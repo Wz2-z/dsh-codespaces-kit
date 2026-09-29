@@ -103,7 +103,7 @@ start "dsh tunnel" /min cmd /c ""%DIR%\gh\bin\gh.exe" codespace ports forward 30
 | 本机隧道 | `curl http://127.0.0.1:3080/` 返回 401（说明隧道通了） |
 | 浏览器 | 用返回的 token 地址能进 dsh 界面 |
 | git 备份 | 本地 `HEAD` == `git ls-remote origin refs/heads/main` |
-| 空目录同步 | 新建一个空文件夹，5 分钟内仓库里出现它 + `.gitkeep` |
+| 空目录同步 | 新建一个空文件夹，等改动静默下来后仓库里出现它 + `.gitkeep` |
 
 ---
 

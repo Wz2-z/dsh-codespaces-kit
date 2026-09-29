@@ -43,8 +43,8 @@ bash ~/cloud-setup.sh              # 真正执行
 也可以用 `curl … | bash` 的写法，但**先存下来看一眼再跑**更稳妥 —— 这个脚本会：
 
 - 往 `~/.ssh/` 写一把新密钥，并把公钥登记成**只对一个仓库可写**的 deploy key
-- 往 `/workspaces/<repo>/.dsh-cloud/` 写 `start.sh` / `update.sh` / `sync.sh`
-- 拉起 dsh 和同步循环，并做一次 `sync --once`
+- 往 `/workspaces/<repo>/.dsh-cloud/` 写 `start.sh` / `update.sh` / `sync.sh` / `sync.conf`
+- 拉起 dsh 和同步守护进程，并做一次 `sync --now`
 
 它**不会**碰你的 `~/.dsh/.credentials.yaml`（API Key）、不会改本机任何设置；
 `~/.dsh/profiles/web/cordis.patch.yml` 里的权限预设也只在缺失时补，不会覆盖你改过的值。
@@ -58,7 +58,7 @@ bash ~/cloud-setup.sh              # 真正执行
 [4/8] 安装 dsh               npm install -g @deepseek-ai/dsh
 [5/8] 配置 workspace         ~/dsh-workspace = 你仓库的克隆
 [6/8] 生成 deploy key        只对这一仓库可写，并登记到 Deploy keys
-[7/8] 配置 sync              .dsh-cloud/{start,update,sync}.sh + 拉起同步循环
+[7/8] 配置 sync              .dsh-cloud/{start,update,sync}.sh + sync.conf（默认智能批量）
 [8/8] 验证                   3080 返回 401、HEAD == 远端、打印带 token 的地址
                              → ✅ Installation complete
 ```

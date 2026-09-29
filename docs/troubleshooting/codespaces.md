@@ -24,7 +24,7 @@ dsh web authentication required; reopen the URL printed by dsh web.
 **解法**：
 
 - 脚本放 `/workspaces/<repo>/.dsh-cloud/`，不要放 `~/`
-- 重要成果 push 到仓库（自动同步本来就每 5 分钟做一次）
+- 重要成果 push 到仓库（自动同步会在改动静默下来后自己做一次）
 - 别随便改 devcontainer 配置；真要改，先确认脚本都在持久卷里
 
 ## 不活跃会被删 + 怎么省额度

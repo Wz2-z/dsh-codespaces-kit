@@ -25,7 +25,7 @@
 │                    │                │                              │
 │ gh CLI（便携版）    │                │  ~/dsh-workspace（工作区）   │
 │  + SSH 密钥         │                │   = 你的私有仓库克隆          │
-└────────────────────┘                │  每 5 分钟自动 commit + push │
+└────────────────────┘                │  静默一会儿自动 commit + push │
                                       └──────────────────────────────┘
 ```
 
@@ -34,7 +34,8 @@
 1. **dsh 跑在云端容器里**，碰不到你本机文件（隔离）。
 2. **必须用 SSH 隧道访问**：GitHub 自带的 `*.app.github.dev` 转发地址打不开 dsh，
    原因见 [Troubleshooting · Codespaces](docs/troubleshooting/codespaces.md)。
-3. **工作区 = 一个私有 GitHub 仓库**，所以成果自动有版本备份。
+3. **工作区 = 一个私有 GitHub 仓库**，成果自动有版本备份：改动停下来（默认 10 分钟）自动提交一次，
+   提交信息按改动内容生成，见 [自动同步](docs/auto-sync.md)。
 4. **人只做下面 5 步**（或者直接跑 [`install/`](install/) 里的一键脚本），其余交给 AI。
 
 ---
@@ -160,7 +161,10 @@ AI 会在桌面放两个快捷方式（图标是 dsh 官方 logo）：
 | --- | --- |
 | 启动 | 双击桌面「DeepSeek Harness」 |
 | 升级 dsh | 双击桌面「更新 dsh」 |
-| 立刻同步一次 | 云端执行 `bash /workspaces/<repo>/.dsh-cloud/sync.sh --once` |
+| 立刻同步一次 | 云端执行 `bash /workspaces/<repo>/.dsh-cloud/sync.sh --now` |
+| 看同步状态 / 待提交的改动 | `bash .dsh-cloud/sync.sh --status` |
+| 换同步模式（智能批量 / 固定周期 / 只手动） | `bash .dsh-cloud/sync.sh --mode=idle\|interval\|manual` |
+| 暂停 / 恢复自动同步 | `bash .dsh-cloud/sync.sh --disable` / `--enable` |
 | 省额度 | <https://github.com/codespaces> 点 **Stop** |
 | 看用了多少额度 | <https://github.com/settings/billing> 里的 Codespaces 一节（或装上面的插件） |
 | 换电脑用 | 让 AI 按任务书的 B 部分生成便携版启动脚本，拷到新电脑双击即可（首次要授权一次 `gh`） |
@@ -200,6 +204,7 @@ AI 会在桌面放两个快捷方式（图标是 dsh 官方 logo）：
 | `docs/ai-prompt.md` | 给 AI 的任务书（复制这段） |
 | `docs/ai-runbook.md` | 技术细节：云端 / 本机命令 + 验收标准 |
 | `docs/cloud-scripts.md` | 云端三个脚本（`start.sh` / `update.sh` / `sync.sh`）精简版参考 |
+| `docs/auto-sync.md` | 自动同步怎么工作：三种模式、提交信息、配置项 |
 | `docs/macos-linux.md` | macOS / Linux 本机怎么用 |
 | `docs/plugins.md` | 插件怎么装（含 `dsh-codespace-panel`） |
 | `docs/directory-layout.md` | 本机与云端的目录结构 |

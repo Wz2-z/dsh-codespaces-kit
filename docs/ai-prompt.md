@@ -27,7 +27,10 @@ A. 云端（Codespaces 容器内）
    - 在 /workspaces/<repo>/.dsh-cloud/ 放三个脚本：
      start.sh（确保 dsh 在跑，最后一行输出带 token 的访问地址）
      update.sh（升级 dsh 到最新版并重启）
-     sync.sh（每 5 分钟自动 commit + push 工作区，含空目录 .gitkeep 处理）
+     sync.sh（智能批量：改动静默 10 分钟后 commit + push 一次；支持
+              idle/interval/manual 三种模式、--status/--plan/--now/--disable，
+              提交信息按改动内容生成，含空目录 .gitkeep 处理，
+              配置写在 .dsh-cloud/sync.conf）
    - 配一把只对 <你的用户名>/<仓库名> 有写权限的 deploy key（不要用账号级 token）
    - 把 dsh 工作区克隆到 ~/dsh-workspace，git 使用这把 deploy key
    - 写 dsh 权限预设：defaultPreset=workspace-write，presets 里保留 read-only，

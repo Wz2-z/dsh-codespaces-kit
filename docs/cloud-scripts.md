@@ -46,39 +46,29 @@ if [ -n "$PID" ]; then kill "$PID"; sleep 2; fi
 bash /workspaces/<repo>/.dsh-cloud/start.sh
 ```
 
-`sync.sh`：自动提交推送（含空目录处理）
+`sync.sh`：自动同步（智能批量）
+
+真实版本有 200 多行（模式切换、状态文件、rebase 重试、提交信息生成），由 `install/cloud-setup.sh` 生成。
+这里只留算法骨架：
 
 ```bash
-#!/usr/bin/env bash
-set -u
-WORK="$HOME/dsh-workspace"; LOG="$HOME/dsh-sync.log"
-keep_empty_dirs() {
-  find "$WORK" \( -name .git -o -name node_modules \) -prune -o -type d -empty -print0 2>/dev/null |
-    while IFS= read -r -d '' d; do
-      rel="${d#"$WORK"/}"
-      if ! git -C "$WORK" check-ignore -q -- "$rel"; then : >"$d/.gitkeep"; fi
-    done
-}
-sync_once() {
-  cd "$WORK" || return 1
-  keep_empty_dirs
-  if [ -n "$(git status --porcelain 2>/dev/null)" ]; then
-    git add -A
-    git -c user.name="dsh cloud" -c user.email="dsh-cloud@users.noreply.github.com" \
-      commit -q -m "auto-sync $(date '+%Y-%m-%d %H:%M:%S')" >>"$LOG" 2>&1
-    if git push -q origin HEAD >>"$LOG" 2>&1; then
-      echo "$(date -Is) pushed" >>"$LOG"
-    else
-      echo "$(date -Is) push FAILED" >>"$LOG"
-    fi
-  fi
-}
-case "${1:-300}" in
-  --once) sync_once; exit $? ;;
-  *) INTERVAL="$1" ;;
-esac
-while true; do sleep "$INTERVAL"; sync_once; done
+# 1) 指纹：已跟踪 diff + 未跟踪文件的 大小/时间 —— 改一点点就能看出来
+fp=$( { git status --porcelain -uall; git diff --binary; } | sha1sum )
+
+# 2) 有新改动就把"静默计时"重置
+[ "$fp" != "$LAST_FP" ] && CHANGED_AT=$(date +%s)
+
+# 3) 静默够了（或拖过 max_wait）就提交一次
+if [ $(( $(date +%s) - CHANGED_AT )) -ge "$idle_seconds" ]; then
+  git add -A
+  git commit -m "$(build_message)"        # dsh: update projects/x (12 files)
+  git push origin HEAD                    # 被拒就 pull --rebase 再试一次
+fi
 ```
+
+- `mode=idle|interval|manual`、`idle_seconds`、`max_wait` 等都在 `.dsh-cloud/sync.conf` 里
+- 提交信息按改动目录自动生成；也可以用 `--message=` 或 `.dsh-cloud/commit-msg` 指定一次
+- 行为细节见 [自动同步](auto-sync.md)
 
 ---
 

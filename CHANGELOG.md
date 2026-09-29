@@ -3,6 +3,23 @@
 版本号规则：`MAJOR.MINOR.PATCH`（[语义化版本](https://semver.org/lang/zh-CN/)）。
 发新版时改三处：本文件、[`VERSION`](VERSION)、`install/setup.ps1` 与 `install/setup.sh` 里的 `KIT_VERSION`。
 
+## [1.1.0] - 2026-09-29
+
+自动同步从"每 5 分钟一个 `auto sync`"改成**智能批量**。
+
+**新行为**
+
+- 默认 `idle` 模式：改动停下来 `idle_seconds`（默认 600 秒）之后才提交一次；
+  一直有人改也会在 `max_wait`（默认 1800 秒）后兜底提交，不会整天不提交
+- 提交信息自动生成，例如 `dsh: update projects/plugincreate (12 files)`，
+  正文列出改动文件；AI 或人也可以用 `.dsh-cloud/commit-msg` 指定一次提交信息
+- 三种模式可切换：`idle`（智能批量）/ `interval`（固定周期，旧行为）/ `manual`（只手动）
+- `sync.sh --status / --plan / --now / --enable / --disable` 是新的控制面；
+  配置在 `.dsh-cloud/sync.conf`（跟着仓库走，换电脑也一样）
+- push 被拒时自动 `pull --rebase` 重试一次，失败就留到下一轮，不丢改动
+
+细节见 [docs/auto-sync.md](docs/auto-sync.md)。
+
 ## [1.0.0] - 2026-09-29
 
 第一个正式版本：把"照着文档手搓"变成"跑一个脚本"。
