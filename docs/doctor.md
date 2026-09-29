@@ -55,3 +55,14 @@ bash install/doctor.sh
 
 - 不改任何配置、不重启 dsh、不提交代码 —— 只读检查（隧道那一项会临时开一个端口转发，查完就关）
 - 不发任何东西到 GitHub 之外；云端那半只是在本机跑仓库里的脚本
+
+## 写 .bat / .ps1 时踩过的两个坑
+
+自己写启动器时容易撞上这两条（都在这套脚本里踩过）：
+
+1. **`.bat` 必须是 CRLF 行尾**：LF 行尾的批处理里 `goto 标签` 会报
+   *"The system cannot find the batch label specified"* —— 用 LF 编辑器的同学注意。
+2. **中文输出要先 `chcp 65001`**：容器里的脚本输出是 UTF-8，而中文 Windows 控制台默认 936，
+   直接 `type` 出来就是 `妯″紡锛歩dle` 这种乱码。在 `.bat` 开头加
+   `chcp 65001 >nul`，`.ps1` 里加 `[Console]::OutputEncoding = [Text.Encoding]::UTF8`。
+   （`.ps1` 文件本身要存成**带 BOM 的 UTF-8**，否则 PowerShell 5.1 会按 GBK 读中文。）

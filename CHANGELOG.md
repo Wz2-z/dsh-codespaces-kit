@@ -3,6 +3,16 @@
 版本号规则：`MAJOR.MINOR.PATCH`（[语义化版本](https://semver.org/lang/zh-CN/)）。
 发新版时改三处：本文件、[`VERSION`](VERSION)、`install/setup.ps1` 与 `install/setup.sh` 里的 `KIT_VERSION`。
 
+## [1.4.1] - 2026-09-29
+
+Windows 启动器上的两个真实事故（都在用的时候撞出来的）：
+
+- **`.bat` 里的 `goto` 找不到标签**：批处理写成 LF 行尾时，`goto 标签` 会报
+  *"The system cannot find the batch label specified"*。生成的 `.bat` 一律写成 **CRLF**。
+- **中文输出变 `妯″紡锛歩dle`**：容器输出是 UTF-8，中文 Windows 控制台默认 936。
+  `dsh-codespaces.bat` / 桌面控制台开头都加 `chcp 65001 >nul`；`.ps1` 存成带 BOM 的 UTF-8。
+- 这两条写进 [docs/doctor.md](docs/doctor.md)，自己写启动器时能少踩一次。
+
 ## [1.4.0] - 2026-09-29
 
 **`dsh-codespaces doctor` 成为核心命令**：一条命令看清整条链路。

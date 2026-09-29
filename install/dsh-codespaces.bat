@@ -1,6 +1,7 @@
 @echo off
 rem dsh-codespaces <command> -- Windows entry point
 setlocal
+chcp 65001 >nul
 set "HERE=%~dp0"
 set "CMD=%~1"
 
