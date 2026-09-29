@@ -33,5 +33,6 @@
         "@deepseek-ai/dsh-client-locale"
       ]
     }
-  }
+  },
+  "author": "Wz2-z (https://github.com/Wz2-z)"
 }

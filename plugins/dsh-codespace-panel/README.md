@@ -1,5 +1,7 @@
 # dsh-codespace-panel
 
+作者：[@Wz2-z](https://github.com/Wz2-z) · 许可：MIT
+
 在 DSH Web 界面里看 **GitHub Codespaces 额度**，并**一键停止当前 Codespace**。一个 bundle、一行 Host 插件、四个 EXACT 路由。
 
 - **触发按钮**：侧边栏底部、Settings 旁边的电池图标（`sidebar.footer.action`，id `codespace-quota`）；数据加载后展开状态会显示剩余核心·小时数，右上角小圆点按用量变色。
@@ -42,3 +44,9 @@
 1. **只插入一行，而且必须一次装好**：loader 里出现一行激活失败（`inactive`）会破坏其它插件设置表单所依赖的「可配置条目」视图；而 `dsh-remote-web-ui` 的表单每个页面会话只绑定一次，绑坏了就再也不会注册它的侧边栏按钮，直到刷新/重启。第一次安装之所以和它共存无碍，正是因为那次没有失败行。
 2. **不导出 `Config` 模式**：改为在 `apply` 里手写归一化，这样本插件不会往 profile 的可配置条目表面添加任何特殊形态。
 3. **客户端只在 `sidebar.footer.action` 放一个恒定尺寸的图标**：那一行同时被 `dsh-remote-web-ui` 和 `dsh-cost-meter` 的 CSS 接管布局，尺寸变化或时隐时现都会带动别人的控件。
+
+## 截图
+
+![Codespaces 额度面板](./screenshots/panel.png)
+
+> 侧边栏底部的电池图标展开后的面板：本月额度（核心·小时 / 存储）、硬件占用、当前 Codespace 状态与一键停止。截图中的 Codespace 名与仓库名已打码。
