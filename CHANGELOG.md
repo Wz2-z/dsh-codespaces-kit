@@ -3,6 +3,23 @@
 版本号规则：`MAJOR.MINOR.PATCH`（[语义化版本](https://semver.org/lang/zh-CN/)）。
 发新版时改三处：本文件、[`VERSION`](VERSION)、`install/setup.ps1` 与 `install/setup.sh` 里的 `KIT_VERSION`。
 
+## [1.4.0] - 2026-09-29
+
+**`dsh-codespaces doctor` 成为核心命令**：一条命令看清整条链路。
+
+- `install/doctor.ps1`（Windows）/ `install/doctor.sh`（macOS、Linux）= 本机侧，
+  加上 `install/cloud-doctor.sh`（送进容器跑）= 云端侧，合成 12 行表格：
+  GitHub CLI / GitHub authentication / Codespace / DSH / SSH key / Workspace /
+  Deploy key / Auto sync / Sync config / dsh web / Tunnel / Launcher
+- 三档状态：`✓` 正常、`!` 警告（能用但值得看一眼）、`✗` 坏了；有 `✗` 时退出码 1
+- `install/dsh-codespaces.bat` / `install/dsh-codespaces.sh` 作为统一入口：
+  `dsh-codespaces doctor` / `dsh-codespaces setup`
+- 只读检查（隧道那一项临时开一次端口转发，查完就关）；`-NoTunnel` 跳过，`-Json` 给脚本用
+- 踩到的两个细节：PowerShell 5.1 管道会把脚本按 ASCII 重编码（中文变 `?`），
+  改成用 `cmd <` 直接喂文件；`gh` 连不上网时也会报 "token invalid"，现在区分开
+- README 的成本措辞改成："在账户自带的 Codespaces 额度内可零额外费用运行，超出额度可能产生费用"
+- 细节见 [docs/doctor.md](docs/doctor.md)
+
 ## [1.3.0] - 2026-09-29
 
 自动同步有"看得见"的控制面了：一个 dsh 插件 + 一个 Windows 桌面控制台。

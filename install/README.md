@@ -10,6 +10,13 @@
 | 本机（macOS / Linux） | `setup.sh` | 同上（用系统里已装的 gh） |
 | Codespaces 容器里 | `cloud-setup.sh` | 8 步流水线：Node → dsh → workspace → deploy key → sync → 验证 |
 
+装完（或任何时候）可以体检：
+
+```
+Windows           powershell -ExecutionPolicy Bypass -File doctor.ps1
+macOS / Linux     ./dsh-codespaces.sh doctor     # 或 bash doctor.sh
+```
+
 ## 本机一键（推荐）
 
 **Windows**（普通用户权限，不需要管理员）：

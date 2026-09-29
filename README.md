@@ -7,7 +7,7 @@
 | | |
 | --- | --- |
 | **适合谁** | 想用官方 dsh，但不想在本机跑 agent、没有信用卡买云主机、或者想要一个完全隔离的云端环境 |
-| **成本** | ¥0（GitHub 免费额度：120 核·小时/月 ≈ 2 核 60 小时 + 15 GB 存储） |
+| **成本** | 在账户自带的 Codespaces 使用额度内可**零额外费用**运行（免费账号：120 核·小时/月 ≈ 2 核 60 小时 + 15 GB 存储）；**超出额度可能产生费用**（按 GitHub 的计费标准） |
 | **本机要装什么** | 一个便携版 GitHub CLI。不用管理员权限，不装 Node / Python |
 | **要多久** | 第一次约 15–20 分钟，大部分时间是等 AI 干活 |
 
@@ -37,6 +37,8 @@
 3. **工作区 = 一个私有 GitHub 仓库**，成果自动有版本备份：改动停下来（默认 10 分钟）自动提交一次，
    提交信息按改动内容生成，见 [自动同步](docs/auto-sync.md)。
 4. **人只做下面 5 步**（或者直接跑 [`install/`](install/) 里的一键脚本），其余交给 AI。
+
+装完想确认一切正常？跑一次体检：[`dsh-codespaces doctor`](#体检dsh-codespaces-doctor) —— 本机 + 云端 12 项检查。
 
 ---
 
@@ -181,6 +183,45 @@ AI 会在桌面放两个快捷方式（图标是 dsh 官方 logo）：
 
 ---
 
+## 体检：`dsh-codespaces doctor`
+
+任何时候觉得"哪里不对"，先跑这个：
+
+```powershell
+# Windows（也可以双击桌面「dsh 体检」）
+powershell -ExecutionPolicy Bypass -File install\doctor.ps1
+```
+
+```bash
+# macOS / Linux
+bash install/doctor.sh
+# 或者：./install/dsh-codespaces.sh doctor
+```
+
+```
+GitHub CLI               ✓  gh version 2.101.0 (2026-09-15)
+GitHub authentication    ✓  已登录：<你的账号>
+Codespace                ✓  your-codespace（Available）
+DSH                      ✓  0.1.7-rc.2（/home/codespace/.nvm/versions/node/v22.x.y/bin）
+SSH key                  ✓  ~/.ssh/dsh_cs_key（可读，ssh-ed25519）
+Workspace                ✓  干净，HEAD=1a2b3c4（与远端一致）
+Deploy key               ✓  ed25519，能读写 <你的仓库>
+Auto sync                ✓  守护进程 pid 12345 · 模式 idle · 最近一条日志 …
+Sync config              ✓  mode=idle · 静默 600s · 折叠 1800s
+dsh web                  ✓  监听 127.0.0.1:3080，需要 token（401 = 正常）
+Tunnel                   ✓  127.0.0.1:3080 → 401（需要 token，正常）
+Launcher                 ✓  桌面有 DeepSeek Harness / 更新 dsh
+
+12/12 checks passed
+```
+
+- 前 4 项是本机侧，中间 6 项由本机把 `install/cloud-doctor.sh` 送进容器执行，最后 2 项是本机侧的隧道与启动器
+- `✓` 正常 / `!` 警告（能用，看一眼）/ `✗` 坏了（上面写着怎么修）；有 `✗` 时退出码为 1
+- `-NoTunnel`（PowerShell）/ `--no-tunnel`（bash）跳过隧道检查；`-Json` / `--json` 输出 JSON
+- 每一项对应的修法见 [docs/doctor.md](docs/doctor.md)
+
+---
+
 ## Troubleshooting
 
 正常安装不需要读这一节。出问题时按现象找：
@@ -206,6 +247,7 @@ AI 会在桌面放两个快捷方式（图标是 dsh 官方 logo）：
 | `docs/ai-runbook.md` | 技术细节：云端 / 本机命令 + 验收标准 |
 | `docs/cloud-scripts.md` | 云端三个脚本（`start.sh` / `update.sh` / `sync.sh`）精简版参考 |
 | `docs/auto-sync.md` | 自动同步怎么工作：三种模式、提交信息、配置项 |
+| `docs/doctor.md` | 体检的 12 项分别是什么、坏了怎么修 |
 | `docs/macos-linux.md` | macOS / Linux 本机怎么用 |
 | `docs/plugins.md` | 插件怎么装（含 `dsh-codespace-panel`） |
 | `docs/directory-layout.md` | 本机与云端的目录结构 |
