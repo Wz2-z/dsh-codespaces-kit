@@ -111,99 +111,86 @@ if [ "$NO_BACKUP" = 0 ]; then
   echo "备份分支：$BACKUP → $(git rev-parse --short HEAD)"
 fi
 
-TMPD="$(mktemp -d)"
-HELPER="$TMPD/amend-msg.sh"
-cat > "$HELPER" <<'HELPER_EOF'
-#!/usr/bin/env bash
-# 在执行 rebase 的仓库里把当前 HEAD（刚 fixup 完的那条）的信息按改动内容重写
-set -u
-subj="$(git log -1 --format=%s)"
-printf '%s' "$subj" | grep -Eq "$SQUASH_MATCH_RE" || exit 0
-files="$(git show --name-only -z --format= HEAD | tr '\0' '\n' | sed '/^$/d' | tr -d '"')"
-count="$(printf '%s\n' "$files" | grep -c . || true)"
-dirs="$(printf '%s\n' "$files" | awk -F/ 'NF>1{print $1"/"$2} NF==1{print $1}' |
-  sort | uniq -c | sort -rn | head -2 | awk '{print $2}' | paste -sd', ' -)"
-# 用被合并提交原本的作者身份，别再要求仓库里配好 user.name
-an="$(git log -1 --format=%an)"; ae="$(git log -1 --format=%ae)"
-git -c user.name="$an" -c user.email="$ae" \
-  commit --amend -q -m "dsh: update ${dirs:-workspace} (${count:-0} files) — 合并 ${1:-?} 次自动同步"
-HELPER_EOF
-chmod +x "$HELPER"
+is_auto_subject() { printf '%s' "$1" | grep -Eq "$MATCH_RE"; }
+EMPTY_TREE="$(git hash-object -t tree /dev/null)"
 
-SEQ="$TMPD/sequence-editor.sh"
-cat > "$SEQ" <<'SEQ_EOF'
-#!/usr/bin/env bash
-# 重写 rebase 的 todo：每段连续自动提交里，第一条 pick，其余 fixup，段尾 exec 改信息
-set -u
-todo="$1"
-out="$todo.new"
-: > "$out"
-mapfile -t lines < "$todo"
-n=${#lines[@]}
-PREV_AUTO=0
-run_size=0
-for ((i = 0; i < n; i++)); do
-  line="${lines[$i]}"
-  case "$line" in
-    pick\ *) ;;
-    *) printf '%s\n' "$line" >> "$out"; continue ;;
-  esac
-  sha="$(printf '%s' "$line" | awk '{print $2}')"
-  subj="$(git log -1 --format=%s "$sha" 2>/dev/null || echo '')"
-  is_auto=0
-  printf '%s' "$subj" | grep -Eq "$SQUASH_MATCH_RE" && is_auto=1
-  next_auto=0
-  for ((j = i + 1; j < n; j++)); do
-    case "${lines[$j]}" in
-      pick\ *)
-        nsha="$(printf '%s' "${lines[$j]}" | awk '{print $2}')"
-        nsubj="$(git log -1 --format=%s "$nsha" 2>/dev/null || echo '')"
-        printf '%s' "$nsubj" | grep -Eq "$SQUASH_MATCH_RE" && next_auto=1
-        break ;;
-    esac
-  done
-  if [ "$is_auto" = 1 ]; then
-    if [ "$PREV_AUTO" = 1 ]; then
-      printf 'fixup %s %s\n' "$sha" "$subj" >> "$out"
-      run_size=$((run_size + 1))
-    else
-      printf 'pick %s %s\n' "$sha" "$subj" >> "$out"
-      run_size=1
-    fi
-    # 只在真的合并了 ≥2 条时改信息；落单的自动提交保持原样
-    if [ "$next_auto" = 0 ] && [ "$run_size" -ge 2 ]; then
-      printf 'exec %s %s\n' "$SQUASH_HELPER" "$run_size" >> "$out"
-      run_size=0
-    fi
+# 用给定的 tree / 父提交 / 信息重建一个提交，作者与时间沿用源提交
+make_commit() {
+  _src="$1"; _tree="$2"; _parent="$3"; _msg="$4"
+  _an="$(git log -1 --format=%an "$_src")"; _ae="$(git log -1 --format=%ae "$_src")"
+  _ad="$(git log -1 --format=%aI "$_src")"
+  _cn="$(git log -1 --format=%cn "$_src")"; _ce="$(git log -1 --format=%ce "$_src")"
+  _cd="$(git log -1 --format=%cI "$_src")"
+  if [ -n "$_parent" ]; then
+    printf '%s\n' "$_msg" | GIT_AUTHOR_NAME="$_an" GIT_AUTHOR_EMAIL="$_ae" GIT_AUTHOR_DATE="$_ad" \
+      GIT_COMMITTER_NAME="$_cn" GIT_COMMITTER_EMAIL="$_ce" GIT_COMMITTER_DATE="$_cd" \
+      git commit-tree "$_tree" -p "$_parent" -F -
   else
-    printf 'pick %s %s\n' "$sha" "$subj" >> "$out"
-    run_size=0
+    printf '%s\n' "$_msg" | GIT_AUTHOR_NAME="$_an" GIT_AUTHOR_EMAIL="$_ae" GIT_AUTHOR_DATE="$_ad" \
+      GIT_COMMITTER_NAME="$_cn" GIT_COMMITTER_EMAIL="$_ce" GIT_COMMITTER_DATE="$_cd" \
+      git commit-tree "$_tree" -F -
   fi
-  PREV_AUTO=$is_auto
+}
+
+merged_message() {
+  _base="$1"; _tree="$2"; _n="$3"
+  _files="$(git diff --name-only -z "$_base" "$_tree" 2>/dev/null | tr '\0' '\n' | sed '/^$/d' | tr -d '"')"
+  _count="$(printf '%s\n' "$_files" | grep -c . || true)"
+  _dirs="$(printf '%s\n' "$_files" | awk -F/ 'NF>1{print $1"/"$2} NF==1{print $1}' |
+    sort | uniq -c | sort -rn | head -3 | awk '{print $2}' | paste -sd', ' -)"
+  printf 'dsh: update %s (%s files) — 合并 %s 次自动同步' "${_dirs:-workspace}" "${_count:-0}" "$_n"
+}
+
+# 按"段"重放整条历史：每段连续自动提交压成一条（内容 = 该段最后一条的 tree），
+# 其余提交原样重建。不用 rebase，所以中间态出现"空改动"也不会失败。
+OLD_TREE="$(git rev-parse HEAD^{tree})"
+NEW=""
+i=0; n_all=${#ALL[@]}; created=0; skipped=0
+while [ "$i" -lt "$n_all" ]; do
+  sha="${ALL[$i]}"
+  subj="$(git log -1 --format=%s "$sha")"
+  if is_auto_subject "$subj"; then
+    j="$i"
+    while [ $((j + 1)) -lt "$n_all" ] && is_auto_subject "$(git log -1 --format=%s "${ALL[$((j + 1))]}")"; do
+      j=$((j + 1))
+    done
+    run_len=$((j - i + 1))
+    src="${ALL[$j]}"
+    tree="$(git rev-parse "$src^{tree}")"
+    if [ "$run_len" -ge 2 ]; then
+      base_tree="$EMPTY_TREE"
+      [ -n "$NEW" ] && base_tree="$(git rev-parse "$NEW^{tree}")"
+      if git diff --quiet "$base_tree" "$tree" 2>/dev/null; then
+        echo "  跳过净改动为空的一段：$(git rev-parse --short "${ALL[$i]}")…$(git rev-parse --short "$src")（$run_len 条）"
+        skipped=$((skipped + 1))
+      else
+        NEW="$(make_commit "$src" "$tree" "$NEW" "$(merged_message "$base_tree" "$tree" "$run_len")")"
+        created=$((created + 1))
+      fi
+    else
+      NEW="$(make_commit "$sha" "$tree" "$NEW" "$subj")"
+      created=$((created + 1))
+    fi
+    i=$((j + 1))
+  else
+    tree="$(git rev-parse "$sha^{tree}")"
+    NEW="$(make_commit "$sha" "$tree" "$NEW" "$(git log -1 --format=%B "$sha")")"
+    created=$((created + 1))
+    i=$((i + 1))
+  fi
 done
-mv "$out" "$todo"
-SEQ_EOF
-chmod +x "$SEQ"
 
-export SQUASH_MATCH_RE="$MATCH_RE"
-export SQUASH_HELPER="$HELPER"
-export GIT_EDITOR=true
-rm -f "$(git rev-parse --git-dir)/SQUASH_MSG_COUNT"
+[ -n "$NEW" ] || { echo "重建失败：没有生成任何提交"; exit 1; }
+git update-ref -m "squash-autosync" "refs/heads/$BRANCH" "$NEW" "$(git rev-parse HEAD)"
+git reset -q --hard "$NEW" || { echo "更新工作区失败，用 $BACKUP 回滚"; exit 1; }
 
-# 从最早的自动提交的父提交开始 rebase（没有父提交就用 --root）
-FIRST="${MATCHED[0]}"
-if git rev-parse "$FIRST^" >/dev/null 2>&1; then
-  BASE="$(git rev-parse "$FIRST^")"
-  echo "重写范围：$BASE..HEAD"
-  GIT_SEQUENCE_EDITOR="$SEQ" git rebase -i "$BASE" || { echo "rebase 失败，可以用 $BACKUP 回滚"; exit 1; }
-else
-  echo "重写范围：--root..HEAD"
-  GIT_SEQUENCE_EDITOR="$SEQ" git rebase -i --root || { echo "rebase 失败，可以用 $BACKUP 回滚"; exit 1; }
+if [ "$(git rev-parse HEAD^{tree})" != "$OLD_TREE" ]; then
+  echo "❌ 重建后文件树和原来不一致，没有推送。用 $BACKUP 回滚"
+  exit 1
 fi
-rm -rf "$TMPD"
 
 echo
-echo "改完了，新历史："
+echo "改完了（跳过 $skipped 段净改动为空的，共建 $created 条），新历史："
 git log --oneline -8 | sed 's/^/  /'
 
 if [ "$PUSH" = 1 ]; then

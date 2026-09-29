@@ -3,6 +3,19 @@
 版本号规则：`MAJOR.MINOR.PATCH`（[语义化版本](https://semver.org/lang/zh-CN/)）。
 发新版时改三处：本文件、[`VERSION`](VERSION)、`install/setup.ps1` 与 `install/setup.sh` 里的 `KIT_VERSION`。
 
+## [1.2.2] - 2026-09-29
+
+`tools/squash-autosync.sh` 换掉了 rebase 方案 —— 在真实仓库上它直接失败了。
+
+- **现象**：`fixup` 折叠时，如果某条提交刚好把上一条抵消（加一行 / 立刻删一行），
+  中间态变成空提交，`git commit --amend` 报 *"would make it empty"*，rebase 停下
+- **改法**：按"段"重放。每段连续自动提交用「该段最后一条的 tree」建一条新提交，
+  其余提交原样重建；没有 rebase 就没有中间态空提交这回事
+- 整段净改动为 0 → 整段跳过（不留空提交）
+- 重建后强制校验 **最终文件树 == 原 HEAD 的 tree**，不一致就中止、不推送
+- 回归测试补齐：加一行/删一行、整段净零、落单自动提交、手工提交原样保留
+  （隔离测试 13/13，最终 tree 逐字节相同）
+
 ## [1.2.1] - 2026-09-29
 
 文件名里带特殊字符（空格、引号、非 ASCII）时，`git` 会把路径**加引号转义**输出，
