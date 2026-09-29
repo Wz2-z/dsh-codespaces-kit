@@ -3,6 +3,16 @@
 版本号规则：`MAJOR.MINOR.PATCH`（[语义化版本](https://semver.org/lang/zh-CN/)）。
 发新版时改三处：本文件、[`VERSION`](VERSION)、`install/setup.ps1` 与 `install/setup.sh` 里的 `KIT_VERSION`。
 
+## [1.2.3] - 2026-09-29
+
+两个"重复跑安装器"时才暴露的问题。
+
+- **不再覆盖你调过的 `sync.conf`**：以前重跑安装器会把 `mode` / `squash_window_seconds`
+  这些设置重置回默认值。现在只在文件不存在时生成，已有的原样保留
+  （README 里"重跑只刷新脚本、不动你的设置"这句这才算数）
+- **折叠失败不再卡住**：`git commit --amend` 失败（比如净改动为空的边界情况）时，
+  以前会当成"折叠成功"继续，改动可能一直提交不上去。现在失败就退回正常新增提交
+
 ## [1.2.2] - 2026-09-29
 
 `tools/squash-autosync.sh` 换掉了 rebase 方案 —— 在真实仓库上它直接失败了。

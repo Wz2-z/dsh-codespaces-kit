@@ -270,7 +270,10 @@ CLOUD_DIR="$REPO_ROOT/.dsh-cloud"
 run mkdir -p "$CLOUD_DIR"
 
 if [ "$DRY_RUN" = 0 ]; then
-  cat > "$CLOUD_DIR/sync.conf" <<'DSH_CONF'
+  if [ -f "$CLOUD_DIR/sync.conf" ]; then
+    info "保留你已有的 sync.conf（要改模式用 sync.sh --mode=… / --squash-window=…）"
+  else
+    cat > "$CLOUD_DIR/sync.conf" <<'DSH_CONF'
 # 自动同步设置（改完不用重启，下一次 tick 就会读到）
 #   enabled       on / off
 #   mode          idle(智能批量，默认) / interval(固定周期) / manual(只手动)
@@ -291,6 +294,7 @@ tick=30
 prefix=dsh
 squash_window_seconds=0
 DSH_CONF
+  fi
 
   cat > "$CLOUD_DIR/start.sh" <<'DSH_START'
 #!/usr/bin/env bash
@@ -497,15 +501,19 @@ commit_now() {
       "$prefix: "*)
         if [ $(( $(now_epoch) - LAST_TS )) -le "$squash_window_seconds" ]; then
           PRE_FOLD="$(git rev-parse HEAD)"
-          git -c user.name="dsh cloud" -c user.email="dsh-cloud@users.noreply.github.com" \
-            commit -q --amend -m "$MSG" ${BODY:+-m "$BODY"} >>"$LOG" 2>&1
-          if git push -q --force-with-lease origin "HEAD:$BRANCH" >>"$LOG" 2>&1; then
-            echo "$(date -Is) folded into previous auto-commit  $MSG" >>"$LOG"
-            FP="$(fingerprint)"; LAST_COMMIT_AT="$(now_epoch)"; FIRST_AT=""; CHANGED_AT="$LAST_COMMIT_AT"
-            return 0
+          if git -c user.name="dsh cloud" -c user.email="dsh-cloud@users.noreply.github.com" \
+               commit -q --amend -m "$MSG" ${BODY:+-m "$BODY"} >>"$LOG" 2>&1; then
+            if git push -q --force-with-lease origin "HEAD:$BRANCH" >>"$LOG" 2>&1; then
+              echo "$(date -Is) folded into previous auto-commit  $MSG" >>"$LOG"
+              FP="$(fingerprint)"; LAST_COMMIT_AT="$(now_epoch)"; FIRST_AT=""; CHANGED_AT="$LAST_COMMIT_AT"
+              return 0
+            fi
+            git reset -q --soft "$PRE_FOLD"
+            echo "$(date -Is) fold push rejected, fallback to a new commit" >>"$LOG"
+          else
+            git reset -q --soft "$PRE_FOLD"
+            echo "$(date -Is) fold amend failed, fallback to a new commit" >>"$LOG"
           fi
-          git reset -q --soft "$PRE_FOLD"
-          echo "$(date -Is) fold push rejected, fallback to a new commit" >>"$LOG"
         fi
         ;;
     esac
