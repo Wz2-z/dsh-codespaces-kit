@@ -2,11 +2,23 @@
 
 作者：[@Wz2-z](https://github.com/Wz2-z) · 许可：MIT
 
-在 DSH Web 界面里看 **GitHub Codespaces 额度**，并**一键停止当前 Codespace**。一个 bundle、一行 Host 插件、四个 EXACT 路由。
+在 DSH Web 界面里看 **GitHub Codespaces 额度**、**当前 Codespace 的状态与硬件占用（内存 / CPU / 磁盘）**，并直接**启动 / 停止 / 重启**它。一个 bundle、一行 Host 插件、七个 EXACT 路由。
 
 - **触发按钮**：侧边栏底部、Settings 旁边的电池图标（`sidebar.footer.action`，id `codespace-quota`）；数据加载后展开状态会显示剩余核心·小时数，右上角小圆点按用量变色。
 - **弹出面板**：注册在框架级浮层 `shell.overlay`，不会被任何一栏裁剪。
-- 面板内容：套餐、本月计算额度（核心·小时）、存储额度（GB·月）、进度条、剩余量、重置日期、原始用量明细；底部是「当前 Codespace」——状态、机器规格、自动停止时间、上次使用，以及带二次确认的 **停止 Codespace**。
+- **Codespace 卡片**（上半）：状态点 + 状态文字 → 机器/存储规格 → 内存 / CPU / 磁盘三条实时占用条（按用量变色）+ 最近约 4 分钟的双线趋势图 → `启动 / 停止 / 重启 / 重建` 四宫格 → 页脚一行「刷新时间 · 进程数 · 运行时长」和 Git 状态（干净 / 有未提交 / 有未推送 + 分支）。
+- **额度卡片**（下半）：套餐、本月计算额度（核心·小时）、存储额度（GB·月）、进度条、剩余量、重置日期、原始用量明细。
+
+## 控制按钮的真实能力
+
+容器一停，DSH 和这个页面就一起结束，所以「从容器内部能做什么」有硬边界：
+
+| 按钮 | 实际行为 |
+| --- | --- |
+| 启动 | 真的调用 `POST /user/codespaces/{name}/start`；只有在状态是 `Shutdown` 时可用（正常情况下面板只在运行时能打开，所以它基本是灰的） |
+| 停止 | 真的调用 `.../stop`，二次确认；停止后额度和这个页面同时结束 |
+| 重启 | 先 `.../stop`，再由 Host 在 20 秒后补发一次 `.../start`。停止会把进程一起带走，所以这次启动**可能赶不上**；没赶上就到 github.com/codespaces 点 Start |
+| 重建 | **没有 REST 接口**（`gh codespace rebuild` 走的是容器自己的 gRPC 通道），所以这一格是链接：打开编辑器，用命令面板执行「Codespaces: Rebuild Container」 |
 
 ## 两套凭据，两种权限
 
@@ -21,10 +33,25 @@
 
 - `GET  /codespace-quota/summary[?refresh=1]` — 额度快照
 - `POST /codespace-quota/token` — 保存/清空额度令牌
-- `GET  /codespace-quota/codespace` — 当前 Codespace 状态
+- `GET  /codespace-quota/codespace` — 当前 Codespace 状态（含机器规格与 git 状态）
 - `POST /codespace-quota/stop` — 停止当前 Codespace
+- `POST /codespace-quota/start` — 启动当前 Codespace
+- `POST /codespace-quota/restart` — 停止 + 20 秒后补一次启动
+- `GET  /codespace-quota/resources` — 硬件快照（cgroup + statfs，不经过 GitHub API）
 
-全部是 EXACT 路由：Web 服务器先查 exact 表再查 prefix 表，谁也不会被别人的前缀路由盖住。
+全部是 EXACT 路由：Web 服务器先查 exact 表再查 prefix 表，谁也不会被别人的前缀路由挡住。
+
+每个成功响应都带 `data.version`，值就是本仓库 `package.json` 的 `version`（Host 启动时读取同一目录的 `package.json`），面板标题栏显示为 `v0.2.0`。
+
+## 版本号
+
+版本号的**唯一来源是 `package.json` 的 `version`**，仓库里没有任何第二处硬编码：
+
+- 面板标题栏显示 `v<version>`（Host 在每次成功响应里回传，客户端不自己写死）；
+- DSH 插件页显示的就是这个包版本；
+- 发版时只改 `package.json` 一处，然后重启 dsh（Host 代码在进程内是缓存的）。
+
+当前：**v0.2.0**。
 
 ## 可选配置
 

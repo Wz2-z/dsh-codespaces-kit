@@ -1,13 +1,13 @@
 {
   "name": "dsh-codespace-panel",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
-  "description": "GitHub Codespaces 额度面板：本月额度、当前 Codespace 状态与一键停止。",
+  "description": "GitHub Codespaces 面板：本月额度、当前 Codespace 状态、硬件使用（内存/CPU/磁盘）与启停控制。",
   "icon": "./icon.svg",
   "meta": {
     "title": "Codespaces 额度面板（Codespaces Panel）",
-    "description": "侧边栏底部的电池按钮：查看本月 Codespaces 额度（已用/剩余），以及当前 Codespace 的状态与一键停止。"
+    "description": "侧边栏底部的电池按钮：本月 Codespaces 额度、当前 Codespace 状态与硬件使用（内存/CPU/磁盘），以及启动/停止/重启控制。"
   },
   "exports": {
     ".": "./index.js",

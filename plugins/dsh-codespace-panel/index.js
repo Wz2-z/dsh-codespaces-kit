@@ -51,6 +51,9 @@ const PLAN_QUOTA = {
 }
 const FALLBACK_QUOTA = PLAN_QUOTA.free
 
+/** How long a restart waits before asking GitHub to start the codespace again. */
+const RESTART_START_DELAY_MS = 20000
+
 const DEFAULTS = {
   token: '',
   apiBase: 'https://api.github.com',
@@ -92,7 +95,18 @@ export function apply(ctx, rawConfig) {
   mount(`${ROUTE_PREFIX}/token`, 'token')
   mount(`${ROUTE_PREFIX}/codespace`, 'codespace')
   mount(`${ROUTE_PREFIX}/stop`, 'stop')
+  mount(`${ROUTE_PREFIX}/start`, 'start')
+  mount(`${ROUTE_PREFIX}/restart`, 'restart')
   mount(`${ROUTE_PREFIX}/resources`, 'resources')
+}
+
+/** The version this module was loaded from — the number kept in the repository. */
+let versionPromise = null
+function packageVersion() {
+  versionPromise ??= readFile(new URL('./package.json', import.meta.url), 'utf8')
+    .then((text) => String(JSON.parse(text).version ?? ''))
+    .catch(() => '')
+  return versionPromise
 }
 
 /** Validate by hand (this plugin exports no Config schema) and report typos. */
@@ -117,7 +131,7 @@ function normalizeConfig(ctx, rawConfig) {
 
 /* ------------------------------------------------------------------ routing */
 
-const METHODS = { summary: 'GET', codespace: 'GET', token: 'POST', stop: 'POST', resources: 'GET' }
+const METHODS = { summary: 'GET', codespace: 'GET', token: 'POST', stop: 'POST', start: 'POST', restart: 'POST', resources: 'GET' }
 
 async function handle(ctx, config, state, action, req, res) {
   const site = String(req.headers['sec-fetch-site'] ?? '').toLowerCase()
@@ -131,7 +145,11 @@ async function handle(ctx, config, state, action, req, res) {
     return
   }
   try {
-    sendJson(res, 200, await dispatch(ctx, config, state, action, req))
+    const payload = await dispatch(ctx, config, state, action, req)
+    if (payload?.ok === true && payload.data !== undefined && payload.data !== null) {
+      payload.data = { ...payload.data, version: await packageVersion() }
+    }
+    sendJson(res, 200, payload)
   } catch (error) {
     ctx.logger?.warn?.('dsh-codespace-panel: %s', error?.message ?? String(error))
     sendJson(res, 200, {
@@ -159,6 +177,10 @@ async function dispatch(ctx, config, state, action, req) {
       return collectResources()
     case 'stop':
       return stopCodespace(ctx, config)
+    case 'start':
+      return startCodespace(ctx, config)
+    case 'restart':
+      return restartCodespace(ctx, config)
     default:
       return { ok: false, error: { code: 'not-found', message: `未知动作 ${action}` } }
   }
@@ -356,6 +378,20 @@ async function codespaceInfo(ctx, config) {
       createdAt: String(codespace.created_at ?? ''),
       pendingOperation: codespace.pending_operation === true,
       webUrl: String(codespace.web_url ?? ''),
+      machineName: String(codespace.machine?.name ?? ''),
+      machineCores: numberOrNull(codespace.machine?.cpus),
+      memoryBytes: numberOrNull(codespace.machine?.memory_in_bytes),
+      storageBytes: numberOrNull(codespace.machine?.storage_in_bytes),
+      // The API's own view of the checkout, so the panel needs no git subprocess.
+      git: codespace.git_status === undefined || codespace.git_status === null
+        ? null
+        : {
+            uncommitted: codespace.git_status.has_uncommitted_changes === true,
+            unpushed: codespace.git_status.has_unpushed_changes === true,
+            ahead: numberOrNull(codespace.git_status.ahead) ?? 0,
+            behind: numberOrNull(codespace.git_status.behind) ?? 0,
+            ref: String(codespace.git_status.ref ?? ''),
+          },
       credentials: credentials.codespaceSource,
       fetchedAt: new Date().toISOString(),
     },
@@ -369,6 +405,37 @@ async function stopCodespace(ctx, config) {
   if (name === '') throw quotaError('no-codespace', '无法识别当前 Codespace（缺少 CODESPACE_NAME）')
   await call(config, credentials, 'POST', `/user/codespaces/${encodeURIComponent(name)}/stop`)
   return { ok: true, data: { name, state: 'Shutdown', requestedAt: new Date().toISOString() } }
+}
+
+/** Start a codespace that is not running (the panel can only exist while it is). */
+async function startCodespace(ctx, config) {
+  const credentials = await credentialsFor(ctx, config)
+  const name = credentials.codespaceName
+  if (name === '') throw quotaError('no-codespace', '无法识别当前 Codespace（缺少 CODESPACE_NAME）')
+  await call(config, credentials, 'POST', `/user/codespaces/${encodeURIComponent(name)}/start`)
+  return { ok: true, data: { name, state: 'Starting', requestedAt: new Date().toISOString() } }
+}
+
+/**
+ * Restart = stop, then one start attempt after a delay. The stop takes this
+ * process down with it, so the attempt is scheduled here and may never run; a
+ * missed attempt leaves the codespace stopped, which the caller is told.
+ */
+async function restartCodespace(ctx, config) {
+  const credentials = await credentialsFor(ctx, config)
+  const name = credentials.codespaceName
+  if (name === '') throw quotaError('no-codespace', '无法识别当前 Codespace（缺少 CODESPACE_NAME）')
+  const path = `/user/codespaces/${encodeURIComponent(name)}`
+  await call(config, credentials, 'POST', `${path}/stop`)
+  setTimeout(() => {
+    call(config, credentials, 'POST', `${path}/start`).catch((error) => {
+      ctx.logger?.warn?.('dsh-codespace-panel: scheduled restart start failed: %s', error?.message ?? String(error))
+    })
+  }, RESTART_START_DELAY_MS)
+  return {
+    ok: true,
+    data: { name, state: 'ShuttingDown', scheduledStartMs: RESTART_START_DELAY_MS, requestedAt: new Date().toISOString() },
+  }
 }
 
 /* ------------------------------------------------------------- hardware use */

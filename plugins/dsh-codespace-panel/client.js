@@ -97,6 +97,8 @@ window.__ModuleLoader__.load({
       csBusy: '有操作进行中',
       specMachine: '机器',
       specStorage: '存储',
+      specIdle: '自动停止',
+      specIdleValue: '空闲 {minutes} 分钟',
       hwCoresSuffix: '核',
       quotaTitle: '本月额度',
       btnStart: '启动',
@@ -108,6 +110,7 @@ window.__ModuleLoader__.load({
       actWorking: '执行中…',
       actFailed: '操作失败',
       actStartDisabled: '已经在运行（这个面板只在运行时才能打开）',
+      actStopConfirm: '确定停止 {name}？',
       actStartRequested: '已请求启动',
       actStopRequested: '已请求停止，Codespace 正在关闭——这个页面随时会断开',
       actRestartRequested: '已请求重启：停止 → {seconds} 秒后尝试启动；若启动没赶上，请到 github.com/codespaces 点 Start',
@@ -115,6 +118,7 @@ window.__ModuleLoader__.load({
       actRestartWhy: '容器一停，DSH 和这个页面就一起结束，因此内部只能发出「停止」，并在 {seconds} 秒后补一次启动请求；没成功就在 github.com/codespaces 点 Start。',
       actRebuildHint: 'Rebuild Container 没有 REST 接口（gh 走的是容器自己的 gRPC 通道），所以这里打开编辑器，用命令面板执行「Codespaces: Rebuild Container」',
       actStopping: '正在停止…',
+      actNeedRestart: '这个动作要等 Host 代码生效——重启一次 dsh 后可用',
       syncNever: '尚未刷新',
       syncNow: '刚刚刷新',
       syncAgo: '{seconds} 秒前刷新',
@@ -123,6 +127,40 @@ window.__ModuleLoader__.load({
       gitClean: 'Git ✓ 干净',
       gitDirty: 'Git ● 有未提交改动',
       gitUnpushed: '有未推送提交',
+      // Host payloads carry codes and raw states; every visible word is picked here.
+      unit_core_hours: '核心·小时',
+      unit_gb_month: 'GB·月',
+      plan_free: 'Free',
+      plan_pro: 'Pro',
+      plan_unknown: '未知套餐',
+      state_Available: '运行中',
+      state_Shutdown: '已停止',
+      state_Starting: '启动中',
+      state_ShuttingDown: '正在停止',
+      state_Queued: '排队中',
+      state_Creating: '创建中',
+      state_Deleted: '已删除',
+      state_Unavailable: '不可用',
+      state_Moved: '已迁移',
+      state_Failed: '失败',
+      state_unknown: '未知',
+      err_forbidden: '请求被拒绝（缺少插件请求头，或来自跨站页面）',
+      err_method: '这个请求方法不被允许',
+      err_no_token: '尚未配置 GitHub 令牌',
+      err_no_codespace: '无法识别当前 Codespace（缺少 CODESPACE_NAME）',
+      err_auth: '令牌无效或已过期',
+      err_timeout: 'GitHub API 请求超时',
+      err_network: '无法访问 GitHub API（网络问题）',
+      err_not_found: '找不到该资源（Codespace 可能已被删除）',
+      err_conflict: '该 Codespace 正在执行其它操作，请稍后再试',
+      err_invalid: 'GitHub 拒绝了这次请求',
+      err_http: 'GitHub API 返回了错误状态',
+      err_unexpected: 'GitHub 返回了预期之外的数据',
+      err_too_large: '请求体过大',
+      err_bad_json: '请求体不是合法 JSON',
+      err_not_json: '这个动作要等 Host 代码生效——重启一次 dsh 后可用',
+      err_internal: '插件内部错误',
+      err_unknown: '未知错误',
     }
 
     const en = {
@@ -196,6 +234,8 @@ window.__ModuleLoader__.load({
       csBusy: 'operation in progress',
       specMachine: 'Machine',
       specStorage: 'Storage',
+      specIdle: 'Auto-stop',
+      specIdleValue: 'after {minutes} idle min',
       hwCoresSuffix: 'cores',
       quotaTitle: 'This month',
       btnStart: 'Start',
@@ -207,6 +247,7 @@ window.__ModuleLoader__.load({
       actWorking: 'Working…',
       actFailed: 'Action failed',
       actStartDisabled: 'Already running (this panel only exists while it runs)',
+      actStopConfirm: 'Stop {name}?',
       actStartRequested: 'Start requested',
       actStopRequested: 'Stop requested — the codespace is shutting down and this page will drop',
       actRestartRequested: 'Restart requested: stop → start attempt in {seconds}s; if that one misses, start it from github.com/codespaces',
@@ -214,6 +255,7 @@ window.__ModuleLoader__.load({
       actRestartWhy: 'Stopping ends DSH and this page with it, so from inside we can only ask for the stop and queue one start attempt {seconds}s later; if it misses, press Start on github.com/codespaces.',
       actRebuildHint: 'Rebuild Container has no REST endpoint (gh reaches it over the codespace gRPC channel), so this opens the editor where the command palette runs it',
       actStopping: 'Stopping…',
+      actNeedRestart: 'This action needs the newer Host code — restart dsh once',
       syncNever: 'not refreshed yet',
       syncNow: 'refreshed just now',
       syncAgo: 'refreshed {seconds}s ago',
@@ -222,6 +264,40 @@ window.__ModuleLoader__.load({
       gitClean: 'Git ✓ clean',
       gitDirty: 'Git ● uncommitted changes',
       gitUnpushed: 'unpushed commits',
+      // Host payloads carry codes and raw states; every visible word is picked here.
+      unit_core_hours: 'core-hours',
+      unit_gb_month: 'GB-month',
+      plan_free: 'Free',
+      plan_pro: 'Pro',
+      plan_unknown: 'unknown plan',
+      state_Available: 'Running',
+      state_Shutdown: 'Shut down',
+      state_Starting: 'Starting',
+      state_ShuttingDown: 'Shutting down',
+      state_Queued: 'Queued',
+      state_Creating: 'Creating',
+      state_Deleted: 'Deleted',
+      state_Unavailable: 'Unavailable',
+      state_Moved: 'Moved',
+      state_Failed: 'Failed',
+      state_unknown: 'Unknown',
+      err_forbidden: 'Request refused (missing plugin header, or a cross-site caller)',
+      err_method: 'This request method is not allowed here',
+      err_no_token: 'No GitHub token yet',
+      err_no_codespace: 'Cannot tell which codespace this is (CODESPACE_NAME is missing)',
+      err_auth: 'The token is invalid or expired',
+      err_timeout: 'The GitHub API request timed out',
+      err_network: 'Cannot reach the GitHub API (network problem)',
+      err_not_found: 'Not found (the codespace may have been deleted)',
+      err_conflict: 'That codespace is busy with another operation — try again shortly',
+      err_invalid: 'GitHub rejected this request',
+      err_http: 'The GitHub API answered with an error status',
+      err_unexpected: 'GitHub answered with unexpected data',
+      err_too_large: 'Request body too large',
+      err_bad_json: 'Request body is not valid JSON',
+      err_not_json: 'This action needs the newer Host code — restart dsh once',
+      err_internal: 'Plugin-internal error',
+      err_unknown: 'Unknown error',
     }
 
     /* ----------------------------------------------------------------- style */
@@ -341,6 +417,13 @@ window.__ModuleLoader__.load({
 
     const uiStore = createStore({ open: false })
     const dataStore = createStore({ status: 'idle', value: null, error: null, at: 0 })
+    /** The Host half reports the package version it was loaded from. */
+    const versionStore = createStore({ version: '' })
+
+    function noteVersion(payload) {
+      const version = typeof payload?.data?.version === 'string' ? payload.data.version : ''
+      if (version !== '' && version !== versionStore.getSnapshot().version) versionStore.set({ version })
+    }
 
     let inflight = null
 
@@ -370,8 +453,12 @@ window.__ModuleLoader__.load({
       inflight = (async () => {
         try {
           const payload = await request('GET', force ? '/summary?refresh=1' : '/summary')
-          if (payload.ok === true) dataStore.set({ status: 'ready', value: payload.data, error: null, at: Date.now() })
-          else dataStore.set({ status: 'error', error: payload.error ?? { code: 'unknown' }, at: Date.now() })
+          if (payload.ok === true) {
+            noteVersion(payload)
+            dataStore.set({ status: 'ready', value: payload.data, error: null, at: Date.now() })
+          } else {
+            dataStore.set({ status: 'error', error: payload.error ?? { code: 'unknown' }, at: Date.now() })
+          }
         } catch (error) {
           dataStore.set({
             status: 'error',
@@ -403,8 +490,12 @@ window.__ModuleLoader__.load({
       csInflight = (async () => {
         try {
           const payload = await request('GET', '/codespace')
-          if (payload.ok === true) csStore.set({ status: 'ready', value: payload.data, error: null, at: Date.now() })
-          else csStore.set({ status: 'error', error: payload.error ?? { code: 'unknown' }, at: Date.now() })
+          if (payload.ok === true) {
+            noteVersion(payload)
+            csStore.set({ status: 'ready', value: payload.data, error: null, at: Date.now() })
+          } else {
+            csStore.set({ status: 'error', error: payload.error ?? { code: 'unknown' }, at: Date.now() })
+          }
         } catch (error) {
           csStore.set({
             status: 'error',
@@ -447,6 +538,7 @@ window.__ModuleLoader__.load({
         try {
           const payload = await request('GET', '/resources')
           if (payload.ok === true) {
+            noteVersion(payload)
             const push = (series, next) => [...series, next].slice(-HISTORY_LIMIT)
             resStore.set({
               status: 'ready',
@@ -499,6 +591,36 @@ window.__ModuleLoader__.load({
 
     function useStore(store) {
       return useSubscribed(store.subscribe, store.getSnapshot)
+    }
+
+    /* ------------------------------------------------------ text from the Host */
+
+    /**
+     * The Host half answers with codes and raw states, never with visible prose:
+     * every word the user reads is chosen here, in the language DSH is set to.
+     * A missing key falls back to the Host's own text, so an older Host (or a
+     * code added later) still shows something truthful.
+     */
+    function translateOr(t, key, fallback) {
+      const text = t(key)
+      return text === key ? fallback : text
+    }
+
+    function stateText(t, value) {
+      const state = typeof value?.state === 'string' && value.state !== '' ? value.state : 'unknown'
+      return translateOr(t, `state_${state}`, value?.stateLabel ?? state)
+    }
+
+    function planText(t, value) {
+      const plan = typeof value?.plan === 'string' && value.plan !== '' ? value.plan : 'unknown'
+      return translateOr(t, `plan_${plan}`, value?.planLabel ?? plan)
+    }
+
+    function errorText(t, error, fallbackKey) {
+      const code = typeof error?.code === 'string' ? error.code : ''
+      const key = `err_${code.replace(/-/g, '_')}`
+      if (code !== '' && t(key) !== key) return t(key)
+      return error?.message ?? (fallbackKey === undefined ? '' : t(fallbackKey))
     }
 
     function useTranslate(ctx) {
@@ -611,7 +733,7 @@ window.__ModuleLoader__.load({
               data.persisted === false ? t('memoryOnly') : data.legacyRemoved === true ? t('savedMigrated') : t('save')
             setMessage({ kind: 'ok', text })
           })
-          .catch((error) => setMessage({ kind: 'error', text: error?.message ?? String(error) }))
+          .catch((error) => setMessage({ kind: 'error', text: errorText(t, error, 'actFailed') }))
           .finally(() => setBusy(false))
       }
       return h(
@@ -758,7 +880,7 @@ window.__ModuleLoader__.load({
         return h(
           'div',
           { className: unrouted ? 'csq-warn' : snapshot.status === 'error' ? 'csq-error' : 'csq-line' },
-          unrouted ? t('hwNeedRestart') : snapshot.status === 'error' ? error.message ?? t('hwFailed') : t('hwSampling'),
+          unrouted ? t('hwNeedRestart') : snapshot.status === 'error' ? errorText(t, error, 'hwFailed') : t('hwSampling'),
         )
       }
 
@@ -895,7 +1017,7 @@ window.__ModuleLoader__.load({
         request('POST', `/${action}`)
           .then((payload) => {
             if (payload.ok !== true) {
-              setOutcome({ kind: 'error', text: payload.error?.message ?? t('actFailed') })
+              setOutcome({ kind: 'error', text: errorText(t, payload.error, 'actFailed') })
               return
             }
             setConfirming(null)
@@ -910,11 +1032,19 @@ window.__ModuleLoader__.load({
                     : t('actStartRequested'),
             })
             if (action !== 'start' && value !== null) {
-              csStore.set({ value: { ...value, running: false, stateLabel: t('actStopping') } })
+              csStore.set({ value: { ...value, running: false, state: 'ShuttingDown' } })
             }
             loadCodespace()
           })
-          .catch((error) => setOutcome({ kind: 'error', text: error?.message ?? String(error) }))
+          .catch((error) =>
+            setOutcome({
+              kind: 'error',
+              text:
+                error?.code === 'not-json' || error?.status === 404
+                  ? t('actNeedRestart')
+                  : errorText(t, error, 'actFailed'),
+            }),
+          )
           .finally(() => setPending(null))
       }
 
@@ -933,24 +1063,44 @@ window.__ModuleLoader__.load({
           { className: 'csq-status' },
           value === null
             ? cs.status === 'error'
-              ? h('span', { className: 'csq-error' }, cs.error?.message ?? t('csUnavailable'))
+              ? h('span', { className: 'csq-error' }, errorText(t, cs.error, 'csUnavailable'))
               : h('span', { className: 'csq-line' }, t('csLoading'))
             : h(
                 React.Fragment,
                 null,
                 h('span', { className: 'csq-state-dot', 'data-state': running ? 'ok' : 'idle', 'aria-hidden': 'true' }),
-                h('span', { className: 'csq-state' }, value.stateLabel ?? ''),
+                h('span', { className: 'csq-state' }, stateText(t, value)),
                 value.pendingOperation === true ? h('span', { className: 'csq-badge' }, t('csBusy')) : null,
               ),
         ),
-        value === null
-          ? null
-          : h(
-              'div',
-              { className: 'csq-specs' },
-              h('span', null, h('i', null, t('specMachine')), ` ${value.machineCores ?? '?'} ${t('hwCoresSuffix')} · ${formatBytes(value.memoryBytes)}`),
-              h('span', null, h('i', null, t('specStorage')), ` ${formatBytes(value.storageBytes)}`),
-            ),
+        (() => {
+          if (value === null) return null
+          // The live cgroup/statfs sample wins over the API's nominal spec, so the
+          // spec line always agrees with the bars below it — and it is available
+          // even from a Host generation that does not report the machine fields yet.
+          const cores = usage?.cores ?? value.machineCores ?? null
+          const memoryBytes = usage?.memory?.totalBytes ?? value.memoryBytes ?? null
+          const storageBytes = usage?.disk?.totalBytes ?? value.storageBytes ?? null
+          const idle = value.idleTimeoutMinutes
+          const chips = []
+          if (cores !== null || memoryBytes !== null) {
+            chips.push(
+              h(
+                'span',
+                { key: 'machine' },
+                h('i', null, t('specMachine')),
+                ` ${cores === null ? '?' : cores} ${t('hwCoresSuffix')}${memoryBytes === null ? '' : ` · ${formatBytes(memoryBytes)}`}`,
+              ),
+            )
+          }
+          if (storageBytes !== null) {
+            chips.push(h('span', { key: 'storage' }, h('i', null, t('specStorage')), ` ${formatBytes(storageBytes)}`))
+          }
+          if (typeof idle === 'number' && idle > 0) {
+            chips.push(h('span', { key: 'idle' }, h('i', null, t('specIdle')), ` ${t('specIdleValue', { minutes: idle })}`))
+          }
+          return chips.length === 0 ? null : h('div', { className: 'csq-specs' }, chips)
+        })(),
         h(UsageRows, { t }),
         value === null
           ? null
@@ -1056,7 +1206,7 @@ window.__ModuleLoader__.load({
           return h(
             'div',
             null,
-            h('div', { className: 'csq-error' }, error.message ?? t('errorFallback')),
+            h('div', { className: 'csq-error' }, errorText(t, error, 'errorFallback')),
             error.detail === undefined ? null : h('div', { className: 'csq-note' }, error.detail),
             h(
               'div',
@@ -1078,7 +1228,7 @@ window.__ModuleLoader__.load({
           'div',
           { className: 'csq-sub' },
           h('span', null, `@${value.login}`),
-          h('span', { className: 'csq-badge' }, value.planLabel ?? value.plan ?? ''),
+          h('span', { className: 'csq-badge' }, planText(t, value)),
           value.quotaAssumed === true ? h('span', { className: 'csq-badge' }, t('planAssumed')) : null,
         ),
         h(Metric, {
@@ -1088,7 +1238,7 @@ window.__ModuleLoader__.load({
           included: value.compute?.included ?? 0,
           remaining: value.compute?.remaining ?? null,
           percent,
-          unit: value.compute?.unit ?? '',
+          unit: t('unit_core_hours'),
         }),
         h(Metric, {
           t,
@@ -1097,7 +1247,7 @@ window.__ModuleLoader__.load({
           included: value.storage?.included ?? 0,
           remaining: value.storage?.remaining ?? null,
           percent: value.storage?.percent ?? null,
-          unit: value.storage?.unit ?? '',
+          unit: t('unit_gb_month'),
         }),
         h(
           'div',
@@ -1110,7 +1260,7 @@ window.__ModuleLoader__.load({
         ),
         h(Detail, { t, value }),
         snapshot.status === 'error'
-          ? h('div', { className: 'csq-error', style: { marginTop: 8 } }, snapshot.error?.message ?? t('errorFallback'))
+          ? h('div', { className: 'csq-error', style: { marginTop: 8 } }, errorText(t, snapshot.error, 'errorFallback'))
           : null,
       )
     }
@@ -1119,6 +1269,7 @@ window.__ModuleLoader__.load({
       const t = props.t
       const ui = useStore(uiStore)
       const snapshot = useStore(dataStore)
+      const panelVersion = useStore(versionStore).version
 
       React.useEffect(() => {
         if (!ui.open) return undefined
