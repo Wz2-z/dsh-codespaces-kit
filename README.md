@@ -220,6 +220,35 @@ Launcher                 ✓  桌面有 DeepSeek Harness / 更新 dsh
 - `-NoTunnel`（PowerShell）/ `--no-tunnel`（bash）跳过隧道检查；`-Json` / `--json` 输出 JSON
 - 每一项对应的修法见 [docs/doctor.md](docs/doctor.md)
 
+## 生命周期与安全清单
+
+同一个入口下还有四个命令，覆盖"从装到卸"：
+
+```
+dsh-codespaces status      一眼看清现在（Codespace / Tunnel / DSH / 同步 / 上次推送 / 待提交）
+dsh-codespaces audit       凭据与权限清单：创建了哪些 key/token/config，各自能干什么
+dsh-codespaces repair      重新跑一遍安装（幂等）再体检，适合"哪里不对"
+dsh-codespaces update      升级云端 dsh 并重建隧道
+dsh-codespaces uninstall   卸载 / 撤销（默认只预览，要 -Yes + 范围开关才动手）
+```
+
+`status` 的输出长这样：
+
+```
+Codespace       Running   your-codespace（Available）
+Tunnel          Healthy   127.0.0.1:3080 → 401（需要 token，正常）
+DSH             Healthy   0.1.7-rc.2 · pid 62857 · HTTP 401
+Auto sync       Running   idle · on · daemon pid 54889 · 静默 600s · 折叠 1800s
+Last check      32 seconds ago
+Last push       1 minute ago · dsh: add projects/plugincreate (6 files)
+Pending files   0
+In sync         yes（本地 19a6c79 / 远端 19a6c79）
+```
+
+- 生命周期细节：[docs/lifecycle.md](docs/lifecycle.md)
+- **它到底创建了什么、各自能干什么、怎么撤销**：[docs/security-model.md](docs/security-model.md)
+  （一句话：没有账号级 PAT、没有 GitHub App、没有云厂商账号、没有 sudo 改动）
+
 ---
 
 ## Troubleshooting
@@ -248,6 +277,8 @@ Launcher                 ✓  桌面有 DeepSeek Harness / 更新 dsh
 | `docs/cloud-scripts.md` | 云端三个脚本（`start.sh` / `update.sh` / `sync.sh`）精简版参考 |
 | `docs/auto-sync.md` | 自动同步怎么工作：三种模式、提交信息、配置项 |
 | `docs/doctor.md` | 体检的 12 项分别是什么、坏了怎么修 |
+| `docs/lifecycle.md` | status / setup / repair / update / uninstall 各自的用法 |
+| `docs/security-model.md` | 创建了哪些 key/token/config，各自权限与撤销方式 |
 | `docs/macos-linux.md` | macOS / Linux 本机怎么用 |
 | `docs/plugins.md` | 插件怎么装（含 `dsh-codespace-panel`） |
 | `docs/directory-layout.md` | 本机与云端的目录结构 |

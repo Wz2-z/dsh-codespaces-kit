@@ -3,6 +3,31 @@
 版本号规则：`MAJOR.MINOR.PATCH`（[语义化版本](https://semver.org/lang/zh-CN/)）。
 发新版时改三处：本文件、[`VERSION`](VERSION)、`install/setup.ps1` 与 `install/setup.sh` 里的 `KIT_VERSION`。
 
+## [1.5.0] - 2026-09-29
+
+补齐生命周期 + 安全清单 + 统一可观测性。
+
+**生命周期**（`install/dsh-codespaces.bat` / `.sh` 一个入口）：
+
+```
+status  doctor  audit  setup  repair  update  uninstall
+```
+
+- **status**：一屏看清 `Codespace / Tunnel / DSH / Auto sync / Last check / Last push /
+  Last commit / Pending files / In sync`；`-Quick` 跳过隧道检查
+- **audit**：凭据与权限清单（本机 + 云端），只报"有什么、在哪、能干什么"，**不打印任何密钥内容**
+- **repair**：= 重跑一遍幂等的安装 + 再体检；不会覆盖你改过的 `sync.conf`
+- **update**：升级云端 dsh 并重建隧道（Windows 版顺便打开浏览器）
+- **uninstall**：默认**只预览**；`-Yes` + `-Local/-Cloud/-PurgeLocal/-PurgeCloud/
+  -RevokeDeployKey/-DeleteCodespace` 指定范围才动手，并且明确说"不会动什么"
+  （GitHub 登录、仓库内容、DeepSeek API Key）
+
+**安全模型**：[docs/security-model.md](docs/security-model.md) 把每个 key/token/config 的
+位置、能力、撤销方式列成一张表；[docs/lifecycle.md](docs/lifecycle.md) 写清什么时候用哪个命令。
+
+**云端脚本**：`cloud-status.sh` / `cloud-audit.sh` / `cloud-uninstall.sh` 三个只读（或需 `--yes`）
+的小脚本，由本机命令通过 stdin 送进容器执行。
+
 ## [1.4.2] - 2026-09-29
 
 `doctor` 的 Launcher 那一项太死板：只认 `更新 dsh.lnk`，所以把「更新 / 同步 / 体检」

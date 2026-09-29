@@ -26,7 +26,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-$KitVersion = '1.4.2'
+$KitVersion = '1.5.0'
 $CloudSetupUrl = 'https://raw.githubusercontent.com/Wz2-z/dsh-codespaces-kit/main/install/cloud-setup.sh'
 try { [Console]::OutputEncoding = [Text.Encoding]::UTF8 } catch {}
 

@@ -10,12 +10,20 @@
 | 本机（macOS / Linux） | `setup.sh` | 同上（用系统里已装的 gh） |
 | Codespaces 容器里 | `cloud-setup.sh` | 8 步流水线：Node → dsh → workspace → deploy key → sync → 验证 |
 
-装完（或任何时候）可以体检：
+装完之后，日常用的是同一个入口：
 
 ```
-Windows           powershell -ExecutionPolicy Bypass -File doctor.ps1
-macOS / Linux     ./dsh-codespaces.sh doctor     # 或 bash doctor.sh
+dsh-codespaces status      一眼看清现在（Codespace / Tunnel / DSH / 同步 / 上次推送 / 待提交）
+dsh-codespaces doctor      12 项体检（本机 + 云端）
+dsh-codespaces audit       凭据 / 权限清单：创建了什么、能干什么、怎么撤销
+dsh-codespaces setup       第一次安装（幂等）
+dsh-codespaces repair      = setup + doctor
+dsh-codespaces update      升级云端 dsh 并重建隧道
+dsh-codespaces uninstall   卸载 / 撤销（默认只预览）
 ```
+
+Windows：`install\dsh-codespaces.bat <命令>`；macOS / Linux：`bash install/dsh-codespaces.sh <命令>`。
+每个命令也可以直接用对应的 `*.ps1` / `*.sh`（参数会原样透传）。
 
 ## 本机一键（推荐）
 
