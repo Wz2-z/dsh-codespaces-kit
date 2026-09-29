@@ -510,3 +510,5 @@ while true; do sleep "$INTERVAL"; sync_once; done
 - **文档**（本 README 等说明文字）：[CC BY 4.0](LICENSE-docs)，可自由复制、修改、转发，保留署名即可。
 
 
+
+- **作者**：[@Wz2-z](https://github.com/Wz2-z)
