@@ -148,6 +148,7 @@ AI 会在桌面放两个快捷方式（图标是 dsh 官方 logo）：
 | 插件 | 干什么 |
 | --- | --- |
 | [`dsh-codespace-panel`](plugins/dsh-codespace-panel/) | 在 dsh 侧边栏看 Codespaces 额度，并一键停止当前 Codespace |
+| [`dsh-sync-panel`](plugins/dsh-sync-panel/) | 在 dsh 侧边栏看自动同步状态，并能暂停/恢复/立即提交/切换模式 |
 
 安装方法见 [插件](docs/plugins.md)。
 
@@ -162,7 +163,7 @@ AI 会在桌面放两个快捷方式（图标是 dsh 官方 logo）：
 | 启动 | 双击桌面「DeepSeek Harness」 |
 | 升级 dsh | 双击桌面「更新 dsh」 |
 | 立刻同步一次 | 云端执行 `bash /workspaces/<repo>/.dsh-cloud/sync.sh --now` |
-| 看同步状态 / 待提交的改动 | `bash .dsh-cloud/sync.sh --status` |
+| 看同步状态 / 待提交的改动 | 点侧边栏的同步按钮，或 `bash .dsh-cloud/sync.sh --status` |
 | 换同步模式（智能批量 / 固定周期 / 只手动） | `bash .dsh-cloud/sync.sh --mode=idle\|interval\|manual` |
 | 暂停 / 恢复自动同步 | `bash .dsh-cloud/sync.sh --disable` / `--enable` |
 | 省额度 | <https://github.com/codespaces> 点 **Stop** |
@@ -210,6 +211,7 @@ AI 会在桌面放两个快捷方式（图标是 dsh 官方 logo）：
 | `docs/directory-layout.md` | 本机与云端的目录结构 |
 | `docs/troubleshooting/` | 排错手册：Windows / SSH / Codespaces / dsh |
 | `plugins/dsh-codespace-panel/` | dsh 插件：Codespaces 额度面板 + 一键停止 |
+| `plugins/dsh-sync-panel/` | dsh 插件：自动同步面板（模式 / 待提交 / 立即提交 / 暂停） |
 | `tools/restart-dsh.sh` | 云端重启 dsh web 的小脚本（改完插件重启用得上） |
 | `tools/squash-autosync.sh` | 把历史上连续的 `auto-sync` 提交合并掉（默认只预览，会建备份分支） |
 | `VERSION` / `CHANGELOG.md` | 版本号与更新日志 |

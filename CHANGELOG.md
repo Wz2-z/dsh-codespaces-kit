@@ -3,6 +3,29 @@
 版本号规则：`MAJOR.MINOR.PATCH`（[语义化版本](https://semver.org/lang/zh-CN/)）。
 发新版时改三处：本文件、[`VERSION`](VERSION)、`install/setup.ps1` 与 `install/setup.sh` 里的 `KIT_VERSION`。
 
+## [1.3.0] - 2026-09-29
+
+自动同步有"看得见"的控制面了：一个 dsh 插件 + 一个 Windows 桌面控制台。
+
+**新插件 `plugins/dsh-sync-panel/`**（独立包，不属于 codespace-panel）
+
+- dsh 侧边栏底部多一个同步按钮，点开是一个面板：模式、是否暂停、守护进程在不在跑、
+  待提交文件、最近一次提交、折叠窗口、`~/dsh-sync.log` 的尾巴
+- 面板上直接操作：立即提交 / 暂停 / 恢复 / 切换 `idle|interval|manual` / 折叠窗口开或关
+- 两条 EXACT 路由（`/sync-panel/summary`、`/sync-panel/action`）都要求自定义请求头
+  `x-sync-panel: 1`；Host 半边不碰 git 凭据、不碰 API Key，只是代跑 `sync.sh`
+- 隔离测试：客户端半边 10 项（假 React/假 ctx 跑 `apply`）、Host 半边 17 项（真机跑真实 `.dsh-cloud`）
+
+**Windows 桌面控制台**
+
+- `outputs/同步控制台.bat` + 桌面快捷方式「dsh 同步」：状态、立即提交、暂停/恢复、
+  切模式、折叠窗口开关、看日志 —— 不用开终端（.bat 内容是纯 ASCII，避免中文变 `????`）
+
+**其他**
+
+- 控制面在哪写进了 [docs/auto-sync.md](docs/auto-sync.md)（命令 / `sync.conf` / 日志 / 面板）
+- 修正一处文档错误：`sync.conf` 在持久卷上，**不在仓库里**，换电脑要重设
+
 ## [1.2.4] - 2026-09-29
 
 - **重跑安装器后会重建同步守护进程**：`sync.sh` / `start.sh` 是被覆盖重写的，

@@ -37,6 +37,25 @@ pnpm add ~/dsh-public/plugins/dsh-codespace-panel
   在面板里粘贴即可 —— 它存进 dsh 的凭据存储（`$DSH_HOME/.credentials.yaml`，0600），不会进仓库；
 - 当前 Codespace 的状态与"一键停止"：用容器自带的平台令牌，**零配置**。
 
+## dsh-sync-panel（在侧边栏看/管自动同步）
+
+和上面那个是**两个独立插件**，互不依赖，可以只装一个。
+
+面板里能看到：当前模式（`idle` / `interval` / `manual`）、是否已暂停、守护进程在不在跑、
+待提交的文件、最近一次提交、折叠窗口、以及 `~/dsh-sync.log` 的最后几行；
+按钮有：立即提交、暂停、恢复、切换模式、折叠窗口开关。
+
+**装法**（和上面一样，换名字即可）：
+
+```bash
+git clone https://github.com/Wz2-z/dsh-codespaces-kit.git ~/dsh-public
+cd ~/.dsh/profiles/web
+pnpm add ~/dsh-public/plugins/dsh-sync-panel
+# 再把 "dsh-sync-panel" 加进 package.json 的 dsh.profile.bundles
+```
+
+细节见 [`plugins/dsh-sync-panel/README.md`](../plugins/dsh-sync-panel/README.md)。
+
 ## 装之前值得问自己的三件事
 
 1. 这个插件会不会读到我的 API Key / 私钥？（`~/.dsh/.credentials.yaml`、`~/.ssh`）

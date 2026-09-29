@@ -9,7 +9,7 @@
 # =============================================================================
 set -u
 
-KIT_VERSION="1.2.4"
+KIT_VERSION="1.3.0"
 CLOUD_SETUP_URL="https://raw.githubusercontent.com/Wz2-z/dsh-codespaces-kit/main/install/cloud-setup.sh"
 
 REPO=""

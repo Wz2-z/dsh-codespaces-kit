@@ -78,8 +78,14 @@ bash /workspaces/<repo>/.dsh-cloud/sync.sh --mode=manual
 
 ## 控制面在哪
 
-目前**没有图形界面**（你之前画的那个 `Auto sync: [ON] / Commit mode: (o) …` 面板还没做），
-开关都在容器里的命令行上。想在哪儿看到它：
+三种看法，随便挑一个：
+
+1. **dsh 侧边栏的同步按钮**（装了 [`dsh-sync-panel`](../plugins/dsh-sync-panel/) 就有）——
+   点开就是模式、待提交、最近提交、日志，外加暂停/恢复/立即提交/切模式；
+2. **Windows 桌面快捷方式「dsh 同步」**（`outputs/同步控制台.bat`）—— 菜单式，不用开终端；
+3. **命令行**（最全，容器里的 `sync.sh`）。
+
+命令行里的东西：
 
 | 想看什么 | 在哪 |
 | --- | --- |
