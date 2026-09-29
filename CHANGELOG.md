@@ -1,0 +1,31 @@
+# 更新日志
+
+版本号规则：`MAJOR.MINOR.PATCH`（[语义化版本](https://semver.org/lang/zh-CN/)）。
+发新版时改三处：本文件、[`VERSION`](VERSION)、`install/setup.ps1` 与 `install/setup.sh` 里的 `KIT_VERSION`。
+
+## [1.0.0] - 2026-09-29
+
+第一个正式版本：把"照着文档手搓"变成"跑一个脚本"。
+
+**一键安装**
+
+- `install/cloud-setup.sh` —— 云端 8 步流水线：检查 GitHub CLI → 检查 Codespace → 检查 Node →
+  安装 dsh → 配置 workspace → 生成 deploy key → 配置自动同步 → 验证，
+  幂等、支持 `--dry-run`，结束打印 `✅ Installation complete`
+- `install/setup.ps1`（Windows）/ `install/setup.sh`（macOS、Linux）—— 本机侧：
+  便携版 gh → 一次浏览器授权 → 选取或新建 Codespace → 把云端脚本送进容器执行 →
+  建隧道验证 → 放桌面启动器
+- 三个云端脚本（`start.sh` / `update.sh` / `sync.sh`）改由 `cloud-setup.sh` 生成，
+  带 Node 路径与仓库信息，容器重建后重跑一次即可
+
+**文档结构**
+
+- 主 README 从 514 行压到 187 行，只回答"我要做哪几步"
+- 拆出 `docs/`：任务书、技术细节、云端脚本、插件、macOS/Linux、目录结构
+- 新增 `docs/troubleshooting/`：按 Windows / SSH / Codespaces / dsh 分类，
+  每个坑都写成「现象 → 原因 → 解法」
+
+**其他**
+
+- 新增版本号（本文件 + `VERSION`）
+- 仓库结构与许可说明整理进 README 末尾

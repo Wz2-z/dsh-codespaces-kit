@@ -2,6 +2,8 @@
 
 在云端跑官方 dsh，本机只负责开一条 SSH 隧道 —— 成果自动备份到你自己的私有仓库。
 
+版本 [`v1.0.0`](CHANGELOG.md) · 一键安装脚本在 [`install/`](install/)
+
 | | |
 | --- | --- |
 | **适合谁** | 想用官方 dsh，但不想在本机跑 agent、没有信用卡买云主机、或者想要一个完全隔离的云端环境 |
@@ -33,7 +35,7 @@
 2. **必须用 SSH 隧道访问**：GitHub 自带的 `*.app.github.dev` 转发地址打不开 dsh，
    原因见 [Troubleshooting · Codespaces](docs/troubleshooting/codespaces.md)。
 3. **工作区 = 一个私有 GitHub 仓库**，所以成果自动有版本备份。
-4. **人只做下面 5 步**，其余交给 AI。
+4. **人只做下面 5 步**（或者直接跑 [`install/`](install/) 里的一键脚本），其余交给 AI。
 
 ---
 
@@ -48,7 +50,37 @@
 | 网络 | 能访问 github.com 即可 |
 | **不需要** | 信用卡、管理员权限、本地装 Node / Python |
 
-### 第 1 步：建一个私有仓库（当"云端主机"）
+### 路线 A：一键脚本（推荐）
+
+**Windows**（普通用户权限即可）：
+
+```powershell
+irm https://raw.githubusercontent.com/Wz2-z/dsh-codespaces-kit/main/install/setup.ps1 -OutFile setup.ps1
+notepad setup.ps1        # 想先看一眼就打开它
+powershell -ExecutionPolicy Bypass -File setup.ps1 -Repo 你的用户名/仓库名
+```
+
+**macOS / Linux**：
+
+```bash
+curl -fsSLO https://raw.githubusercontent.com/Wz2-z/dsh-codespaces-kit/main/install/setup.sh
+less setup.sh            # 想先看一眼
+bash setup.sh --repo=你的用户名/仓库名
+```
+
+脚本自己会走完这条流水线：
+
+```
+检查 GitHub CLI → 检查 Codespace → 检查 Node → 安装 dsh →
+配置 workspace → 生成 deploy key → 配置 sync → 验证
+```
+
+最后打印 `✅ Installation complete`，并在桌面放好启动器。想先看看它打算做什么：
+加 `-DryRun`（PowerShell）/ `--dry-run`（bash）。细节见 [install/README.md](install/README.md)。
+
+### 路线 B：手动五步（想全程自己点）
+
+#### 第 1 步：建一个私有仓库（当"云端主机"）
 
 打开 <https://github.com/new>：
 
@@ -57,7 +89,7 @@
 - 勾选 **Add a README file**
 - Create repository
 
-### 第 2 步：建 Codespace
+#### 第 2 步：建 Codespace
 
 1. 打开 <https://github.com/codespaces> → **New codespace**
 2. Repository：选刚建的 `<仓库名>`
@@ -68,12 +100,12 @@
 顺手改一下闲置时间，否则 30 分钟就休眠：
 <https://github.com/settings/codespaces> → **Default idle timeout** → 240 分钟
 
-### 第 3 步：把任务书发给 AI
+#### 第 3 步：把任务书发给 AI
 
 复制 [给 AI 的任务书](docs/ai-prompt.md)（一整段），把里面 `<...>` 的占位符换成你自己的信息，
 发给 AI（Codex / dsh / 任何 coding agent 都行），然后按它的提示操作。
 
-### 第 4 步：配合 AI 做一次性授权
+#### 第 4 步：配合 AI 做一次性授权
 
 AI 会让你运行一次 `gh auth login`，屏幕上会出现一个**一次性验证码**，你需要：
 
@@ -82,7 +114,7 @@ AI 会让你运行一次 `gh auth login`，屏幕上会出现一个**一次性�
 
 这一步是让本机的 GitHub CLI 能访问你的 Codespace（授权范围包含 `codespace`、`repo`）。只做一次。
 
-### 第 5 步：以后就双击
+#### 第 5 步：以后就双击
 
 AI 会在桌面放两个快捷方式（图标是 dsh 官方 logo）：
 
@@ -164,6 +196,7 @@ AI 会在桌面放两个快捷方式（图标是 dsh 官方 logo）：
 | 路径 | 内容 |
 | --- | --- |
 | `README.md` | 本文件：快速安装 + 配置 + 日常使用 |
+| `install/` | 一键安装：`setup.ps1`（Windows）/ `setup.sh`（macOS、Linux）/ `cloud-setup.sh`（云端 8 步） |
 | `docs/ai-prompt.md` | 给 AI 的任务书（复制这段） |
 | `docs/ai-runbook.md` | 技术细节：云端 / 本机命令 + 验收标准 |
 | `docs/cloud-scripts.md` | 云端三个脚本（`start.sh` / `update.sh` / `sync.sh`）精简版参考 |
@@ -173,6 +206,7 @@ AI 会在桌面放两个快捷方式（图标是 dsh 官方 logo）：
 | `docs/troubleshooting/` | 排错手册：Windows / SSH / Codespaces / dsh |
 | `plugins/dsh-codespace-panel/` | dsh 插件：Codespaces 额度面板 + 一键停止 |
 | `tools/restart-dsh.sh` | 云端重启 dsh web 的小脚本（改完插件重启用得上） |
+| `VERSION` / `CHANGELOG.md` | 版本号与更新日志 |
 
 ---
 
