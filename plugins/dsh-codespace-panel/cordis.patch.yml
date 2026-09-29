@@ -1,0 +1,13 @@
+# dsh-codespace-panel bundle patch: ONE row, and nothing else in the profile.
+#
+# Keeping this to a single row that activates cleanly matters: a loader row that
+# fails to activate can break the config view other plugins' settings forms bind
+# to, and a client plugin that binds its form once per session does not recover
+# from that until the page (or the host) restarts.
+#
+# Optional tunables (validated by the Host half; unknown keys are logged and
+# ignored): token, apiBase, includedCoreHours, includedStorageGb,
+# requestTimeoutMs, cacheSeconds.
+- insert:
+    - id: codespace-panel
+      name: 'dsh-codespace-panel'

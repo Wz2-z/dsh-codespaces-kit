@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Codespaces Panel",
+    "description": "A battery button at the sidebar foot: this month's Codespaces quota (used / left) plus this codespace's state and a one-click stop."
+  }
+}

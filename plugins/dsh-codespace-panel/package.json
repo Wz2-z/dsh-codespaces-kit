@@ -1,0 +1,37 @@
+{
+  "name": "dsh-codespace-panel",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "GitHub Codespaces 额度面板：本月额度、当前 Codespace 状态与一键停止。",
+  "icon": "./icon.svg",
+  "meta": {
+    "title": "Codespaces 额度面板（Codespaces Panel）",
+    "description": "侧边栏底部的电池按钮：查看本月 Codespaces 额度（已用/剩余），以及当前 Codespace 的状态与一键停止。"
+  },
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./package.json": "./package.json",
+    "./locale/*.json": "./locale/*.json"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "icon.svg",
+    "locale/*.json"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-locale"
+      ]
+    }
+  }
+}

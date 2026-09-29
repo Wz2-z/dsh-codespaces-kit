@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Codespaces 额度面板",
+    "description": "侧边栏底部的电池按钮：查看本月 Codespaces 额度（已用/剩余），以及当前 Codespace 的状态与一键停止。"
+  }
+}
