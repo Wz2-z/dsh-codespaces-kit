@@ -1,5 +1,33 @@
 # 用 GitHub Codespaces 部署 DeepSeek Harness（dsh）指南
 
+## 安装 codespace-panel 插件（可选）
+
+在**你自己的 dsh 云端容器**里执行（把内容拷进去，而不是在本地电脑上跑）：
+
+```bash
+# 1) 把插件取到容器里
+git clone https://github.com/Wz2-z/dsh-codespaces-kit.git ~/dsh-public
+
+# 2) 装进 dsh 的 web profile
+cd ~/.dsh/profiles/web
+pnpm add ~/dsh-public/plugins/dsh-codespace-panel
+
+# 3) 让它在启动时加载：把 "dsh-codespace-panel" 加进 package.json 的
+#    dsh.profile.bundles 数组，例如：
+#      "bundles": ["@deepseek-ai/dsh-base", "@deepseek-ai/dsh-web-app", "dsh-codespace-panel"]
+```
+
+改完重启 dsh（`dsh web` 那个进程），刷新页面即可看到侧边栏底部的电池图标。
+
+**凭据说明**：
+
+- 额度数字：需要一个**经典 PAT**（Personal access token (classic)，勾选 `user` 权限），
+  在面板里粘贴即可 —— 它存进 dsh 的凭据存储（`$DSH_HOME/.credentials.yaml`，0600），不会进仓库；
+- 当前 Codespace 的状态与"一键停止"：用容器自带的平台令牌，**零配置**。
+
+> clone 慢的话，也可以只把 `plugins/dsh-codespace-panel/` 这个文件夹拷进容器，再 `pnpm add <那个文件夹路径>`。
+
+
 ## 这个仓库里有什么
 
 - `README.md`（本文件）—— 完整部署指南：人要做的事 + 直接给 AI 的任务书 + 技术细节 + 踩坑清单
