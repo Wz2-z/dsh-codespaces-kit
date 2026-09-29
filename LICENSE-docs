@@ -1,0 +1,10 @@
+本仓库的**文档**（`README.md` 以及仓库中说明性文字）采用
+Creative Commons Attribution 4.0 International（CC BY 4.0）许可发布。
+
+你可以自由地复制、修改、分发本文档，包括用于商业目的，只需保留署名。
+
+- 许可全文：https://creativecommons.org/licenses/by/4.0/legalcode
+- 中文说明：https://creativecommons.org/licenses/by/4.0/deed.zh
+- 建议署名：本文档来自 https://github.com/Wz2-z/dsh-codespaces-kit
+
+仓库中的**代码**（`plugins/`、`tools/` 等）采用 MIT 许可，见 `LICENSE`。

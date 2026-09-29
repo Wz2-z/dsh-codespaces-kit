@@ -502,3 +502,11 @@ while true; do sleep "$INTERVAL"; sync_once; done
 
 **一句话总结**：云端跑 agent、隧道回本机、仓库做备份、脚本做自动化。
 把 §2 的任务书丢给 AI，再按它的提示点几次按钮，就能得到同样的环境。
+
+## 许可证
+
+- **代码**（`plugins/`、`tools/`）：[MIT](LICENSE)
+
+- **文档**（本 README 等说明文字）：[CC BY 4.0](LICENSE-docs)，可自由复制、修改、转发，保留署名即可。
+
+
