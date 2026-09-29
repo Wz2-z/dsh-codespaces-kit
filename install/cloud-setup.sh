@@ -463,8 +463,8 @@ build_message() {
   elif [ "${added:-0}" -gt 0 ] && [ "${added:-0}" = "${total:-1}" ]; then
     verb=add
   fi
-  dirs="$(git -C "$WORKSPACE_DIR" diff --cached --name-only 2>/dev/null |
-    awk -F/ 'NF>1{print $1"/"$2} NF==1{print $1}' | sort | uniq -c | sort -rn |
+  dirs="$(git -C "$WORKSPACE_DIR" diff --cached --name-only -z 2>/dev/null | tr '\0' '\n' |
+    tr -d '"' | awk -F/ 'NF>1{print $1"/"$2} NF==1{print $1}' | sort | uniq -c | sort -rn |
     head -3 | awk '{print $2}' | paste -sd', ' -)"
   [ -n "$dirs" ] || dirs="workspace"
   printf '%s: %s %s (%s files)' "$prefix" "$verb" "$dirs" "${total:-0}"
@@ -488,7 +488,7 @@ commit_now() {
     [ "$was_staged" = 0 ] && git reset -q
     return 0
   fi
-  BODY="$(git diff --cached --name-only | head -20 | paste -sd', ' -)"
+  BODY="$(git diff --cached --name-only -z | tr '\0' '\n' | sed '/^$/d' | head -20 | paste -sd', ' -)"
   # 折叠窗口：上一条也是自动提交、且够新 → 把改动并进去（改写那一条）
   LAST_SUBJ="$(git log -1 --format=%s 2>/dev/null || echo '')"
   LAST_TS="$(git log -1 --format=%ct 2>/dev/null || echo 0)"

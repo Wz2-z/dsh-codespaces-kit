@@ -88,9 +88,9 @@ fi
 changed=0
 for run in "${RUNS[@]}"; do
   first="${run%%#*}"; rest="${run#*#}"; last="${rest%%#*}"; n="${rest##*#}"
-  files="$(git diff --name-only "$first^" "$last" | grep -c . || true)"
-  dirs="$(git diff --name-only "$first^" "$last" |
-    awk -F/ 'NF>1{print $1"/"$2} NF==1{print $1}' | sort | uniq -c | sort -rn |
+  files="$(git diff --name-only -z "$first^" "$last" 2>/dev/null | tr '\0' '\n' | grep -c . || true)"
+  dirs="$(git diff --name-only -z "$first^" "$last" 2>/dev/null | tr '\0' '\n' |
+    tr -d '"' | awk -F/ 'NF>1{print $1"/"$2} NF==1{print $1}' | sort | uniq -c | sort -rn |
     head -2 | awk '{print $2}' | paste -sd', ' -)"
   printf '  %s…%s（%s 条）→ 1 条：dsh: update %s (%s files) — 合并 %s 次自动同步\n' \
     "$(git rev-parse --short "$first")" "$(git rev-parse --short "$last")" "$n" "${dirs:-workspace}" "$files" "$n"
@@ -119,11 +119,14 @@ cat > "$HELPER" <<'HELPER_EOF'
 set -u
 subj="$(git log -1 --format=%s)"
 printf '%s' "$subj" | grep -Eq "$SQUASH_MATCH_RE" || exit 0
-files="$(git show --name-only --format= HEAD | sed '/^$/d')"
+files="$(git show --name-only -z --format= HEAD | tr '\0' '\n' | sed '/^$/d' | tr -d '"')"
 count="$(printf '%s\n' "$files" | grep -c . || true)"
 dirs="$(printf '%s\n' "$files" | awk -F/ 'NF>1{print $1"/"$2} NF==1{print $1}' |
   sort | uniq -c | sort -rn | head -2 | awk '{print $2}' | paste -sd', ' -)"
-git commit --amend -q -m "dsh: update ${dirs:-workspace} (${count:-0} files) — 合并 ${1:-?} 次自动同步"
+# 用被合并提交原本的作者身份，别再要求仓库里配好 user.name
+an="$(git log -1 --format=%an)"; ae="$(git log -1 --format=%ae)"
+git -c user.name="$an" -c user.email="$ae" \
+  commit --amend -q -m "dsh: update ${dirs:-workspace} (${count:-0} files) — 合并 ${1:-?} 次自动同步"
 HELPER_EOF
 chmod +x "$HELPER"
 

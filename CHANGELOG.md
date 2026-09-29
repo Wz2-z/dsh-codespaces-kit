@@ -3,6 +3,14 @@
 版本号规则：`MAJOR.MINOR.PATCH`（[语义化版本](https://semver.org/lang/zh-CN/)）。
 发新版时改三处：本文件、[`VERSION`](VERSION)、`install/setup.ps1` 与 `install/setup.sh` 里的 `KIT_VERSION`。
 
+## [1.2.1] - 2026-09-29
+
+文件名里带特殊字符（空格、引号、非 ASCII）时，`git` 会把路径**加引号转义**输出，
+结果这些引号被写进了提交信息（真实的仓库里就抓到了这个：`dsh: update "tools/dsh-cloud,…`）。
+
+- `sync.sh` 生成提交信息、组织正文时改用 `-z` 输出再转换，不再受 git 引号影响
+- `tools/squash-autosync.sh` 的预览与合并信息同样处理
+
 ## [1.2.0] - 2026-09-29
 
 两件关于"历史别太碎"的事。
