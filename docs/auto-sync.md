@@ -15,6 +15,7 @@
 | `max_wait` | `1800` | 就算一直在改，最多 30 分钟也兜底提交一次 |
 | `tick` | `30` | 守护进程每 30 秒看一次 |
 | `prefix` | `dsh` | 自动提交信息的前缀 |
+| `squash_window_seconds` | `0` | 折叠窗口（默认关闭，见下文） |
 
 ```
 改 改 改 II 改 改 改        ← AI 一直在改
@@ -87,14 +88,42 @@ max_wait=1800
 interval=300
 tick=30
 prefix=dsh
+squash_window_seconds=0
 ```
 
 改完不用重启，守护进程每 `tick` 秒重读一次。
+
+## 折叠窗口（可选）：同一批改动只留一条提交
+
+把 `squash_window_seconds` 设成正数（比如 `1800`）之后：如果**上一条提交也是自动提交**、
+且它在窗口时间内，新改动会**并进那一条**，而不是又开一条。
+
+```bash
+bash .dsh-cloud/sync.sh --squash-window=1800    # 30 分钟内的工作算一批
+bash .dsh-cloud/sync.sh --squash-window=0       # 关掉（默认）
+```
+
+代价：**会改写历史**，所以推送用的是 `push --force-with-lease`。
+如果远端被别的电脑推过（lease 不匹配），它会自动退回"新增一条提交"，不会丢东西。
+多台电脑同时用同一个仓库时，建议保持关闭。
+
+## 整理旧历史
+
+以前跑过老版本（每 5 分钟一条 `auto-sync`）的话，可以用仓库里的工具把那些提交合并掉：
+
+```bash
+bash tools/squash-autosync.sh                   # 先预览会怎么合并
+bash tools/squash-autosync.sh --apply           # 本地改历史（自动建备份分支）
+bash tools/squash-autosync.sh --apply --push    # 顺便 force-with-lease 推上去
+```
+
+只合并**连续**的自动提交，手工写的提交原样保留；合并后的信息会按改动内容重新生成。
 
 ## 会不会丢东西
 
 - `max_wait` 保证"一直在改"也不会超过 30 分钟没提交
 - push 被别人顶掉时，会自动 `pull --rebase` 再推一次；仍然失败就把改动留在工作区，下一轮重试
+- 折叠窗口推送失败时退回正常提交（改动不丢）
 - 真正的兜底还是**远端仓库**：`~/dsh-workspace` 只是克隆，`/workspaces` 是持久卷
 
 ---

@@ -279,6 +279,9 @@ if [ "$DRY_RUN" = 0 ]; then
 #   interval      interval 模式：每隔多久提交一次
 #   tick          守护进程检查间隔
 #   prefix        自动生成的提交信息前缀（例如 dsh: update notes (3 files)）
+#   squash_window_seconds
+#                 折叠窗口：上一条也是自动提交、且在这段时间内，就把新改动并进它
+#                 （0 = 关闭，默认；开启后需要 force-with-lease 改写远端历史）
 enabled=on
 mode=idle
 idle_seconds=600
@@ -286,6 +289,7 @@ max_wait=1800
 interval=300
 tick=30
 prefix=dsh
+squash_window_seconds=0
 DSH_CONF
 
   cat > "$CLOUD_DIR/start.sh" <<'DSH_START'
@@ -349,7 +353,9 @@ max_wait=1800
 interval=300
 tick=30
 prefix=dsh
+squash_window_seconds=0
 MODE_OVERRIDE=""; IDLE_OVERRIDE=""; INT_OVERRIDE=""; ENABLE_OVERRIDE=""; MESSAGE_OVERRIDE=""
+SQUASH_OVERRIDE=""
 FP=""; CHANGED_AT=""; FIRST_AT=""; LAST_COMMIT_AT=""
 
 usage() {
@@ -372,6 +378,7 @@ load_conf() {
       interval) interval="$val" ;;
       tick) tick="$val" ;;
       prefix) prefix="$val" ;;
+      squash_window_seconds) squash_window_seconds="$val" ;;
     esac
   done < "$CONF"
 }
@@ -388,9 +395,17 @@ save_conf() {
       interval=*)     printf 'interval=%s\n' "$interval" ;;
       tick=*)         printf 'tick=%s\n' "$tick" ;;
       prefix=*)       printf 'prefix=%s\n' "$prefix" ;;
+      squash_window_seconds=*) printf 'squash_window_seconds=%s\n' "$squash_window_seconds" ;;
       *)              printf '%s\n' "$line" ;;
     esac
-  done < "$CONF" > "$tmp" && mv "$tmp" "$CONF"
+  done < "$CONF" > "$tmp"
+  # 老版本 sync.conf 里没有新键时补上（否则 --squash-window=… 会悄悄不生效）
+  for kv in "enabled=$enabled" "mode=$mode" "idle_seconds=$idle_seconds" "max_wait=$max_wait" \
+            "interval=$interval" "tick=$tick" "prefix=$prefix" \
+            "squash_window_seconds=$squash_window_seconds"; do
+    grep -q "^${kv%%=*}=" "$tmp" || printf '%s\n' "$kv" >> "$tmp"
+  done
+  mv "$tmp" "$CONF"
 }
 
 load_state() {
@@ -474,6 +489,27 @@ commit_now() {
     return 0
   fi
   BODY="$(git diff --cached --name-only | head -20 | paste -sd', ' -)"
+  # 折叠窗口：上一条也是自动提交、且够新 → 把改动并进去（改写那一条）
+  LAST_SUBJ="$(git log -1 --format=%s 2>/dev/null || echo '')"
+  LAST_TS="$(git log -1 --format=%ct 2>/dev/null || echo 0)"
+  if [ "${squash_window_seconds:-0}" -gt 0 ] && [ -n "$LAST_SUBJ" ]; then
+    case "$LAST_SUBJ" in
+      "$prefix: "*)
+        if [ $(( $(now_epoch) - LAST_TS )) -le "$squash_window_seconds" ]; then
+          PRE_FOLD="$(git rev-parse HEAD)"
+          git -c user.name="dsh cloud" -c user.email="dsh-cloud@users.noreply.github.com" \
+            commit -q --amend -m "$MSG" ${BODY:+-m "$BODY"} >>"$LOG" 2>&1
+          if git push -q --force-with-lease origin "HEAD:$BRANCH" >>"$LOG" 2>&1; then
+            echo "$(date -Is) folded into previous auto-commit  $MSG" >>"$LOG"
+            FP="$(fingerprint)"; LAST_COMMIT_AT="$(now_epoch)"; FIRST_AT=""; CHANGED_AT="$LAST_COMMIT_AT"
+            return 0
+          fi
+          git reset -q --soft "$PRE_FOLD"
+          echo "$(date -Is) fold push rejected, fallback to a new commit" >>"$LOG"
+        fi
+        ;;
+    esac
+  fi
   git -c user.name="dsh cloud" -c user.email="dsh-cloud@users.noreply.github.com" \
     commit -q -m "$MSG" ${BODY:+-m "$BODY"} >>"$LOG" 2>&1 || return 1
   if git push -q origin "HEAD:$BRANCH" >>"$LOG" 2>&1; then
@@ -531,8 +567,8 @@ tick() {
 
 show_status() {
   printf '模式：%s（enabled=%s）\n' "$mode" "$enabled"
-  printf '参数：idle_seconds=%s  max_wait=%s  interval=%s  tick=%s  prefix=%s\n' \
-    "$idle_seconds" "$max_wait" "$interval" "$tick" "$prefix"
+  printf '参数：idle_seconds=%s  max_wait=%s  interval=%s  tick=%s  prefix=%s  squash_window_seconds=%s\n' \
+    "$idle_seconds" "$max_wait" "$interval" "$tick" "$prefix" "$squash_window_seconds"
   if [ -d "$WORKSPACE_DIR/.git" ]; then
     printf '工作区：%s\n' "$WORKSPACE_DIR"
     if dirty; then
@@ -564,6 +600,7 @@ while [ $# -gt 0 ]; do
     --interval=*) INT_OVERRIDE="${1#--interval=}" ;;
     --enable)     ENABLE_OVERRIDE=on ;;
     --disable)    ENABLE_OVERRIDE=off ;;
+    --squash-window=*) SQUASH_OVERRIDE="${1#--squash-window=}" ;;
     --message=*)  MESSAGE_OVERRIDE="${1#--message=}" ;;
     --help|-h)    usage; exit 0 ;;
     *)            echo "未知参数：$1（--help 看用法）"; exit 2 ;;
@@ -576,14 +613,15 @@ load_conf
 [ -n "$IDLE_OVERRIDE" ] && idle_seconds="$IDLE_OVERRIDE"
 [ -n "$INT_OVERRIDE" ] && interval="$INT_OVERRIDE"
 [ -n "$ENABLE_OVERRIDE" ] && enabled="$ENABLE_OVERRIDE"
-if [ -n "$MODE_OVERRIDE$IDLE_OVERRIDE$INT_OVERRIDE$ENABLE_OVERRIDE" ]; then save_conf; fi
+[ -n "$SQUASH_OVERRIDE" ] && squash_window_seconds="$SQUASH_OVERRIDE"
+if [ -n "$MODE_OVERRIDE$IDLE_OVERRIDE$INT_OVERRIDE$ENABLE_OVERRIDE$SQUASH_OVERRIDE" ]; then save_conf; fi
 if [ -n "$MESSAGE_OVERRIDE" ]; then printf '%s\n' "$MESSAGE_OVERRIDE" > "$CLOUD_DIR/commit-msg"; fi
 
 # 只改设置（--enable / --disable / --mode=… / --idle=… / --message=…）时改完就退出，不进守护循环
 if [ "$ACTION" = daemon ] && [ "$ACTION_EXPLICIT" = 0 ] &&
-   [ -n "$MODE_OVERRIDE$IDLE_OVERRIDE$INT_OVERRIDE$ENABLE_OVERRIDE$MESSAGE_OVERRIDE" ]; then
-  printf '已更新 %s\n  enabled=%s mode=%s idle_seconds=%s max_wait=%s interval=%s tick=%s prefix=%s\n' \
-    "$CONF" "$enabled" "$mode" "$idle_seconds" "$max_wait" "$interval" "$tick" "$prefix"
+   [ -n "$MODE_OVERRIDE$IDLE_OVERRIDE$INT_OVERRIDE$ENABLE_OVERRIDE$SQUASH_OVERRIDE${MESSAGE_OVERRIDE}" ]; then
+  printf '已更新 %s\n  enabled=%s mode=%s idle_seconds=%s max_wait=%s interval=%s tick=%s prefix=%s squash_window_seconds=%s\n' \
+    "$CONF" "$enabled" "$mode" "$idle_seconds" "$max_wait" "$interval" "$tick" "$prefix" "$squash_window_seconds"
   [ -n "$MESSAGE_OVERRIDE" ] && printf '下一次提交会用：%s\n' "$MESSAGE_OVERRIDE"
   exit 0
 fi

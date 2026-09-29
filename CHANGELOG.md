@@ -3,6 +3,31 @@
 版本号规则：`MAJOR.MINOR.PATCH`（[语义化版本](https://semver.org/lang/zh-CN/)）。
 发新版时改三处：本文件、[`VERSION`](VERSION)、`install/setup.ps1` 与 `install/setup.sh` 里的 `KIT_VERSION`。
 
+## [1.2.0] - 2026-09-29
+
+两件关于"历史别太碎"的事。
+
+**1. `sync.sh --squash-window=秒`（折叠窗口）**
+
+- 上一条提交也是自动提交、且在这段时间内 → 新改动**并进上一条**，而不是新开一条
+- 默认 `0`（关闭，不重写历史）；开启后用 `push --force-with-lease`，被别人顶掉时
+  自动退回"正常新增一条提交"，不会丢改动
+- 老版本 `sync.conf` 里没有这个键也能用：`--squash-window=1800` 会自动把键补进配置
+
+**2. `tools/squash-autosync.sh`（整理旧历史）**
+
+把过去那些连续的 `auto-sync` 提交合并成一条，手工提交原样保留：
+
+```bash
+bash tools/squash-autosync.sh                 # 默认只预览
+bash tools/squash-autosync.sh --apply --push  # 改历史 + force-with-lease 推送
+```
+
+- 只合并**连续段**（≥2 条），落单的自动提交不动
+- 合并后信息按改动内容重新生成，例如 `dsh: update projects/x, notes (23 files) — 合并 9 次自动同步`
+- 默认先建备份分支 `backup/pre-squash-<时间戳>`；有 merge 提交时直接拒绝
+- 隔离测试验过：合并后**最终文件树逐字节不变**（同一次测试里还校验了手工提交、备份分支）
+
 ## [1.1.1] - 2026-09-29
 
 一个真机跑出来的安装器问题 + 一个顺手升级问题。

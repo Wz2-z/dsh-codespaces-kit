@@ -211,6 +211,7 @@ AI 会在桌面放两个快捷方式（图标是 dsh 官方 logo）：
 | `docs/troubleshooting/` | 排错手册：Windows / SSH / Codespaces / dsh |
 | `plugins/dsh-codespace-panel/` | dsh 插件：Codespaces 额度面板 + 一键停止 |
 | `tools/restart-dsh.sh` | 云端重启 dsh web 的小脚本（改完插件重启用得上） |
+| `tools/squash-autosync.sh` | 把历史上连续的 `auto-sync` 提交合并掉（默认只预览，会建备份分支） |
 | `VERSION` / `CHANGELOG.md` | 版本号与更新日志 |
 
 ---
