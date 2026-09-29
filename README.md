@@ -1,5 +1,14 @@
 # 用 GitHub Codespaces 部署 DeepSeek Harness（dsh）指南
 
+> **公开版说明**：本指南不包含任何人的真实信息。文中 `<你的用户名>`、`<仓库名>`、`<codespace 名>`、`<名称>` 全部是占位符，请替换成你自己的；示例版本号写为 `v22.x.y` 之类。欢迎自由复制、修改、转发。
+> 如果这份指南对你有用，照着 §2 把任务书丢给你的 AI 即可。
+
+## 这个仓库里有什么
+
+- `README.md`（本文件）—— 完整部署指南：人要做的事 + 直接给 AI 的任务书 + 技术细节 + 踩坑清单
+- `plugins/dsh-codespace-panel/` —— dsh 插件：在 dsh 侧边栏显示 Codespaces 额度，并一键停止当前 Codespace
+- `tools/restart-dsh.sh` —— 云端重启 dsh web 的小脚本（改完插件重启用得上）
+
 ## 安装 codespace-panel 插件（可选）
 
 在**你自己的 dsh 云端容器**里执行（把内容拷进去，而不是在本地电脑上跑）：
@@ -27,16 +36,6 @@ pnpm add ~/dsh-public/plugins/dsh-codespace-panel
 
 > clone 慢的话，也可以只把 `plugins/dsh-codespace-panel/` 这个文件夹拷进容器，再 `pnpm add <那个文件夹路径>`。
 
-
-## 这个仓库里有什么
-
-- `README.md`（本文件）—— 完整部署指南：人要做的事 + 直接给 AI 的任务书 + 技术细节 + 踩坑清单
-- `plugins/dsh-codespace-panel/` —— dsh 插件：在 dsh 侧边栏显示 Codespaces 额度，并一键停止当前 Codespace
-- `tools/restart-dsh.sh` —— 云端重启 dsh web 的小脚本（改完插件重启用得上）
-
-
-> **公开版说明**：本指南不包含任何人的真实信息。文中 `<你的用户名>`、`<仓库名>`、`<codespace 名>`、`<名称>` 全部是占位符，请替换成你自己的；示例版本号写为 `v22.x.y` 之类。欢迎自由复制、修改、转发。
-> 如果这份指南对你有用，照着 §2 把任务书丢给你的 AI 即可。
 
 > 适用场景：想用官方 dsh，但**不想在本机跑 agent**、没有信用卡买云主机、或者想要一个完全隔离的云端环境。
 > 成本：¥0（GitHub 免费额度：120 核·小时/月 ≈ 2 核 60 小时 + 15 GB 存储）
