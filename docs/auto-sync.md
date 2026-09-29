@@ -76,9 +76,34 @@ bash /workspaces/<repo>/.dsh-cloud/sync.sh --mode=manual
 | 重新打开 | `bash .dsh-cloud/sync.sh --enable` |
 | 看最近同步了什么 | `tail -n 20 ~/dsh-sync.log` |
 
+## 控制面在哪
+
+目前**没有图形界面**（你之前画的那个 `Auto sync: [ON] / Commit mode: (o) …` 面板还没做），
+开关都在容器里的命令行上。想在哪儿看到它：
+
+| 想看什么 | 在哪 |
+| --- | --- |
+| 模式 / 待提交 / 最近提交 | 容器里执行 `bash .dsh-cloud/sync.sh --status` |
+| 所有可调参数 | `/workspaces/<仓库名>/.dsh-cloud/sync.conf` |
+| 每次同步到底干了什么 | `~/dsh-sync.log`（`pushed` / `folded` / `skipped` / `FAILED`） |
+| dsh 自己的日志 | `~/dsh-web.log`（启动）、`~/dsh-update.log`（升级） |
+
+**怎么进这个终端**，两条路：
+
+1. GitHub → <https://github.com/codespaces> → 打开你的 Codespace（浏览器里的 VS Code）→ Terminal；
+2. 或者在你自己的电脑上（Windows，用安装器放的便携版 gh）：
+
+```bat
+"%LOCALAPPDATA%\dsh-cloud\gh\bin\gh.exe" codespace ssh -c <codespace 名> ^
+  -- -i "%USERPROFILE%\.ssh\dsh_cs_key" "bash /workspaces/<仓库名>/.dsh-cloud/sync.sh --status"
+```
+
 ## 配置在哪
 
-`.dsh-cloud/sync.conf` —— **在工作区里**，所以它跟着仓库走（换电脑、重建容器都还在）：
+`/workspaces/<仓库名>/.dsh-cloud/sync.conf`，在 **Codespaces 的持久卷**上：
+容器重建（`$HOME` 被清空）它也还在，但它**不在你的仓库里** —— 换电脑或删掉 Codespace
+就没了，重新跑一次 `install/cloud-setup.sh` 会生成默认值，再用 `--mode=` / `--squash-window=`
+设一遍即可（安装器不会覆盖你已经改过的 `sync.conf`）。
 
 ```ini
 enabled=on
