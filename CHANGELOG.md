@@ -3,6 +3,13 @@
 版本号规则：`MAJOR.MINOR.PATCH`（[语义化版本](https://semver.org/lang/zh-CN/)）。
 发新版时改三处：本文件、[`VERSION`](VERSION)、`install/setup.ps1` 与 `install/setup.sh` 里的 `KIT_VERSION`。
 
+## [1.2.4] - 2026-09-29
+
+- **重跑安装器后会重建同步守护进程**：`sync.sh` / `start.sh` 是被覆盖重写的，
+  而正在运行的那个 `bash` 可能还停在旧文件的字节偏移上。现在重写脚本后先停掉旧进程，
+  再由 `start.sh` 拉起新的（真机上重复安装三次才暴露出来的）
+- 顺带：安装器输出的"配置自动同步"一节会告诉你它保留了已有的 `sync.conf`
+
 ## [1.2.3] - 2026-09-29
 
 两个"重复跑安装器"时才暴露的问题。

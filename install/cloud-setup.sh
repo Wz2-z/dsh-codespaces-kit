@@ -670,6 +670,13 @@ DSH_UPDATE
   sed -i "s|__NODE_BIN__|$NODE_BIN_DIR|g; s|__CLOUD_DIR__|$CLOUD_DIR|g; s|__BRANCH__|$BRANCH|g" \
     "$CLOUD_DIR/start.sh" "$CLOUD_DIR/sync.sh" "$CLOUD_DIR/update.sh"
   chmod +x "$CLOUD_DIR/start.sh" "$CLOUD_DIR/sync.sh" "$CLOUD_DIR/update.sh"
+  # 脚本被重写过，正在跑的 bash 可能还停在旧文件的偏移上：杀掉，稍后由 start.sh 重新拉起
+  for _p in $(ps -eo pid,args | awk -v d="$CLOUD_DIR/sync.sh" 'index($0, d) {print $1}'); do
+    case "$_p" in "$$"|"$PPID") continue ;; esac
+    if kill "$_p" 2>/dev/null; then
+      info "重建同步守护进程（旧进程 $_p 已停）"
+    fi
+  done
 fi
 if [ "$DRY_RUN" = 1 ]; then
   info "(dry-run) 上面三个脚本 + sync.conf 还没真的写"
