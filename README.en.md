@@ -6,7 +6,7 @@ Run the official dsh inside a Codespace, keep your work in your own private repo
 machine through one SSH tunnel. Your computer only needs a portable GitHub CLI — no admin rights, no Node/Python,
 no credit card.
 
-Version [`v1.7.1`](CHANGELOG.md) · one-shot installer in [`install/`](install/) · the control panel speaks 中文 / English
+Version [`v1.7.2`](CHANGELOG.md) · one-shot installer in [`install/`](install/) · the control panel speaks 中文 / English
 
 | | |
 | --- | --- |
@@ -97,14 +97,14 @@ and ends with `✅ Installation complete`, plus launchers on your desktop.
 5. **From then on, just double-click**: the start launcher wakes the Codespace, starts dsh, opens the tunnel
    and your browser.
 
-The installer puts two shortcuts on your desktop (dsh logo):
+The installer puts two shortcuts on your desktop:
 
 - **DeepSeek Harness** — start: wake the Codespace → start dsh → tunnel → browser
-- **Update dsh** — upgrade the cloud dsh to the latest release
+- **dsh control panel** — one menu with all the maintenance actions
 
-To keep the maintenance actions in one place, use the **Windows control panel** that ships with the kit:
-in your clone, double-click `install\console.bat` (same as
-`powershell -ExecutionPolicy Bypass -File install\console.ps1`):
+The control panel ships with the kit (Windows); the installer drops it and the scripts it calls into
+`%LOCALAPPDATA%\dsh-cloud\`, so double-clicking the desktop shortcut is all it takes. Running
+`install\console.bat` from the kit is the same thing:
 
 ```
 [1] open dsh   [2] status     [3] checkup   [4] auto sync   [5] update dsh
@@ -113,8 +113,8 @@ in your clone, double-click `install\console.bat` (same as
 ```
 
 The header shows Codespace state, sync mode, pending files and the last push; `[E]` flips the whole panel
-between 中文 and English. The panel calls `status.ps1` / `doctor.ps1` / `update.ps1` … from its own folder,
-so running it from the kit's `install\` is the simple path (a shortcut pointing there works too).
+between 中文 and English. The panel calls `status.ps1` / `doctor.ps1` / `update.ps1` … from its own folder —
+`%LOCALAPPDATA%\dsh-cloud\` has them all (installed even with `-SkipShortcuts`, which only skips the shortcuts).
 
 ---
 
@@ -153,10 +153,10 @@ Install steps: [docs/en/plugins.md](docs/en/plugins.md).
 | I want to… | Do this |
 | --- | --- |
 | Start | Double-click the **DeepSeek Harness** shortcut, or control panel → 1 |
-| Open the control panel (Windows) | double-click `install\console.bat` in the kit — open / status / checkup / sync / update / credentials / repair / uninstall on one screen |
+| Open the control panel (Windows) | double-click the **dsh control panel** shortcut — open / status / checkup / sync / update / credentials / repair / uninstall on one screen |
 | See the current state | `dsh-codespaces status`, or control panel → 2 |
 | Health check | `dsh-codespaces doctor` |
-| Update dsh | double-click the **Update dsh** shortcut, or control panel → 5 |
+| Update dsh | control panel → 5, or run `%LOCALAPPDATA%\dsh-cloud\update-dsh.bat` |
 | Commit right now | `bash .dsh-cloud/sync.sh --now` in the container, or control panel → 4 → 2 |
 | Save quota | <https://github.com/codespaces> → **Stop** |
 | See usage | <https://github.com/settings/billing> → Codespaces |

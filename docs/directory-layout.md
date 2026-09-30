@@ -5,13 +5,13 @@
 ```
 本机（Windows）
 ├── Desktop\DeepSeek Harness.lnk          启动（setup.ps1 创建）
-├── Desktop\更新 dsh.lnk                   更新（同上）
+├── Desktop\dsh 管理台.lnk                 菜单：打开 dsh / 状态 / 体检 / 同步 / 更新 / 卸载
 ├── %LOCALAPPDATA%\dsh-cloud\
 │   ├── gh\                               便携版 GitHub CLI（gh\bin\gh.exe）
 │   ├── ghconfig\                         gh 的登录令牌（明文，可 logout）
 │   ├── start-dsh.bat / update-dsh.bat    快捷方式真正指向的两个脚本
+│   ├── console.ps1 / console.bat         管理台（含它调用的 status / doctor / audit / update / uninstall）
 │   └── *-log.txt                         启动 / 更新时的输出
-├── <kit>\install\console.ps1             管理台（console.bat 是启动器，菜单式）
 └── %USERPROFILE%\.ssh\dsh_cs_key         连接 Codespace 的私钥
 
 云端（Codespaces 容器）

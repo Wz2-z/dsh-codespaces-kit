@@ -24,7 +24,7 @@ dsh-codespaces audit -Json  # for scripts
 | **Codespaces platform token** | container `/workspaces/.codespaces/shared/.env` (put there by GitHub) | git/gh inside the container use it; dies with the container | nothing to revoke |
 | **DeepSeek API key** | container `~/.dsh/.credentials.yaml` (mode 0600) | only dsh inside the container uses it; never pushed anywhere | revoke it in the DeepSeek console; the file disappears with the Codespace |
 | **Sync config** `.dsh-cloud/` | container `/workspaces/<repo>/.dsh-cloud/` (persistent volume) | `start.sh` / `update.sh` / `sync.sh` / `sync.conf`, **no credentials** | `uninstall -Yes -Cloud -PurgeCloud` |
-| **Desktop shortcuts + `.bat`** | host desktop and `%LOCALAPPDATA%\dsh-cloud\` (`start-dsh.bat`, `update-dsh.bat`, the control panel `console.ps1`) | launchers only, **no secrets** (paths and a Codespace name) | `uninstall -Yes -Local` |
+| **Desktop shortcuts + `.bat`** | host desktop and `%LOCALAPPDATA%\dsh-cloud\` (`start-dsh.bat`, `update-dsh.bat`, the control panel `console.ps1` + `status`·`doctor`·`audit`·`update`·`uninstall`) | launchers only, **no secrets** (paths and a Codespace name) | `uninstall -Yes -Local` |
 
 ## What does *not* exist
 

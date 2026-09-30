@@ -4,7 +4,7 @@
 
 在云端跑官方 dsh，本机只负责开一条 SSH 隧道 —— 成果自动备份到你自己的私有仓库。
 
-版本 [`v1.7.1`](CHANGELOG.md) · 一键安装脚本在 [`install/`](install/) · 管理台支持中文 / English 切换
+版本 [`v1.7.2`](CHANGELOG.md) · 一键安装脚本在 [`install/`](install/) · 管理台支持中文 / English 切换
 
 | | |
 | --- | --- |
@@ -121,13 +121,13 @@ AI 会让你运行一次 `gh auth login`，屏幕上会出现一个**一次性�
 
 #### 第 5 步：以后就双击
 
-安装器会在桌面放两个快捷方式（图标是 dsh 官方 logo）：
+安装器会在桌面放两个快捷方式：
 
 - **DeepSeek Harness**：启动（唤醒 Codespace → 拉起 dsh → 建隧道 → 打开浏览器）
-- **更新 dsh**：把云端 dsh 升级到最新版
+- **dsh 管理台**：一个菜单，把维护动作都收在一起（下面那套）
 
-想把维护动作也收在一处，就用仓库自带的 **Windows 管理台** —— 在 clone 下来的仓库里双击
-`install\console.bat`（等价于 `powershell -ExecutionPolicy Bypass -File install\console.ps1`）：
+管理台是仓库自带的（Windows），安装器会把它和它调用的脚本一起放到 `%LOCALAPPDATA%\dsh-cloud\`，
+所以双击桌面的「dsh 管理台」就能用；直接跑仓库里的 `install\console.bat` 也是同一个东西：
 
 ```
 [1] 打开 dsh   [2] 状态    [3] 体检    [4] 自动同步   [5] 更新 dsh
@@ -136,8 +136,8 @@ AI 会让你运行一次 `gh auth login`，屏幕上会出现一个**一次性�
 ```
 
 菜单带自检（顶部显示 Codespace 状态、同步模式、待提交、上次推送），`[E]` 可以随时切中文 / English。
-管理台需要和 `status.ps1` / `doctor.ps1` / `update.ps1` 等脚本放在同一个目录，所以直接在仓库的
-`install\` 里用最省事（想让快捷方式指过去也行）。
+管理台要跟 `status.ps1` / `doctor.ps1` / `update.ps1` 这些脚本放在同一个目录，
+`%LOCALAPPDATA%\dsh-cloud\` 里已经配齐（`-SkipShortcuts` 时也会装，只是不建快捷方式）。
 
 使用期间不要关那个最小化的 `dsh tunnel` 黑窗口。
 
@@ -178,8 +178,8 @@ AI 会让你运行一次 `gh auth login`，屏幕上会出现一个**一次性�
 | 想做什么 | 怎么做 |
 | --- | --- |
 | 启动 | 双击桌面「DeepSeek Harness」 |
-| 打开管理台（Windows） | 双击仓库里的 `install\console.bat`：打开 dsh / 状态 / 体检 / 同步 / 更新 / 清单 / 修复 / 卸载，一屏菜单 |
-| 升级 dsh | 双击桌面「更新 dsh」，或管理台 `[5]` |
+| 打开管理台（Windows） | 双击桌面「dsh 管理台」：打开 dsh / 状态 / 体检 / 同步 / 更新 / 清单 / 修复 / 卸载，一屏菜单 |
+| 升级 dsh | 管理台 `[5]`，或直接跑 `%LOCALAPPDATA%\dsh-cloud\update-dsh.bat` |
 | 立刻同步一次 | 云端执行 `bash /workspaces/<repo>/.dsh-cloud/sync.sh --now` |
 | 看同步状态 / 待提交的改动 | 点侧边栏的同步按钮，或 `bash .dsh-cloud/sync.sh --status` |
 | 换同步模式（智能批量 / 固定周期 / 只手动） | `bash .dsh-cloud/sync.sh --mode=idle\|interval\|manual` |
@@ -204,7 +204,7 @@ AI 会让你运行一次 `gh auth login`，屏幕上会出现一个**一次性�
 任何时候觉得"哪里不对"，先跑这个：
 
 ```powershell
-# Windows（也可以走管理台 `install\console.bat` → [3] 体检）
+# Windows（也可以走管理台 → [3] 体检）
 powershell -ExecutionPolicy Bypass -File install\doctor.ps1
 ```
 
@@ -226,7 +226,7 @@ Auto sync                ✓  守护进程 pid 12345 · 模式 idle · 最近一
 Sync config              ✓  mode=idle · 静默 600s · 折叠 1800s
 dsh web                  ✓  监听 127.0.0.1:3080，需要 token（401 = 正常）
 Tunnel                   ✓  127.0.0.1:3080 → 401（需要 token，正常）
-Launcher                 ✓  桌面有 DeepSeek Harness / 更新 dsh
+Launcher                 ✓  桌面有 DeepSeek Harness / dsh 管理台
 
 12/12 checks passed
 ```
@@ -253,7 +253,7 @@ dsh-codespaces uninstall   卸载 / 撤销（默认只预览，要 -Yes + 范围
 
 ```
 ╭──────────────────────────────────────────────────────────────────╮
-│ dsh-codespaces status                                     v1.7.1 │
+│ dsh-codespaces status                                     v1.7.2 │
 │ codespace                     your-codespace-name-here-gxq9gv9gx │
 ╰──────────────────────────────────────────────────────────────────╯
 

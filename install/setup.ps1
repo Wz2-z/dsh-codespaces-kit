@@ -9,7 +9,14 @@
     [1/8] 检查 GitHub CLI（没有就下便携版）
     [2/8] 检查 Codespace（没有就按 -Repo 建一个）
     [3-7/8] 把 install/cloud-setup.sh 送进容器执行（Node / dsh / workspace / deploy key / sync）
-    [8/8] 本机验证：建隧道 → 访问 3080 → 放桌面快捷方式 → 报 Installation complete
+    [8/8] 本机验证：写启动脚本 + 管理台 → 建两个桌面快捷方式 → 建隧道 → 访问 3080
+          → 报 Installation complete
+
+  装完本机是这样的（和仓库 README 的「日常使用」一致）：
+    %LOCALAPPDATA%\dsh-cloud\        start-dsh.bat / update-dsh.bat / console.ps1（管理台）
+                                     + 管理台调用的 status / doctor / audit / update / uninstall
+    桌面「DeepSeek Harness」          启动
+    桌面「dsh 管理台」                打开 dsh / 状态 / 体检 / 自动同步 / 更新 / 权限清单 / 修复 / 卸载
 
   参数：
     -Repo owner/name   用哪个仓库当"云端主机"（新电脑上首次需要）
@@ -26,7 +33,8 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-$KitVersion = '1.7.1'
+$KitVersion = '1.7.2'
+$KitRawBase = 'https://raw.githubusercontent.com/Wz2-z/dsh-codespaces-kit/main'
 $CloudSetupUrl = 'https://raw.githubusercontent.com/Wz2-z/dsh-codespaces-kit/main/install/cloud-setup.sh'
 try { [Console]::OutputEncoding = [Text.Encoding]::UTF8 } catch {}
 
@@ -136,7 +144,7 @@ if ($Cs -and (Test-Path $Gh)) {
 else { Warn '没有 Codespace，跳过云端步骤' }
 
 # ---------------------------------------------------------------------------
-Step 8 '本机验证 + 桌面快捷方式'
+Step 8 '本机验证 + 桌面快捷方式 + 管理台'
 function New-Launcher([string]$name, [string]$cloudScript, [string]$title) {
     # .bat 内容保持纯 ASCII，避免中文被写成 ????
     $body = @"
@@ -160,6 +168,25 @@ endlocal
     return $path
 }
 
+# 管理台（console.ps1）会调用同目录下的这些脚本，所以一起放进 %LOCALAPPDATA%\dsh-cloud\
+$PanelFiles = @('console.ps1', 'console.bat', 'status.ps1', 'doctor.ps1', 'audit.ps1',
+                'update.ps1', 'uninstall.ps1', 'cloud-setup.sh')
+function Install-Panel {
+    # 有本地这份 install\ 就直接拷（你自己 clone 下来跑的场合）；只有一份 setup.ps1 时按 URL 取
+    New-Item -ItemType Directory -Force -Path $CloudDir | Out-Null
+    $allOk = $true
+    foreach ($f in $PanelFiles) {
+        $src = Join-Path $PSScriptRoot $f
+        $dest = Join-Path $CloudDir $f
+        try {
+            if (Test-Path -LiteralPath $src) { Copy-Item -LiteralPath $src -Destination $dest -Force }
+            else { Invoke-WebRequest -Uri "$KitRawBase/install/$f" -OutFile $dest -UseBasicParsing }
+        }
+        catch { Warn "管理台组件 $f 没拿到：$($_.Exception.Message)"; $allOk = $false }
+    }
+    return $allOk
+}
+
 if (-not $DryRun) {
     New-Item -ItemType Directory -Force -Path $CloudDir | Out-Null
     $startBat = New-Launcher 'start-dsh'  'start.sh'  'Starting cloud dsh...'
@@ -167,17 +194,25 @@ if (-not $DryRun) {
     Ok "启动脚本：$startBat"
     Ok "更新脚本：$updBat"
 
+    $panelOk = Install-Panel
+    $maintName = if ($panelOk) { 'dsh 管理台' } else { '更新 dsh' }
+    $maintTarget = if ($panelOk) { Join-Path $CloudDir 'console.bat' } else { $updBat }
+    if ($panelOk) { Ok "管理台：$(Join-Path $CloudDir 'console.ps1')" }
+    else { Warn '管理台没装全：桌面先放「更新 dsh」，以后重跑一次本脚本就能补上' }
+
     if (-not $SkipShortcuts) {
         $desktop = [Environment]::GetFolderPath('Desktop')
         $ws = New-Object -ComObject WScript.Shell
-        foreach ($pair in @(@('DeepSeek Harness', $startBat), @('更新 dsh', $updBat))) {
+        $icon = Join-Path $CloudDir 'icons\dsh.ico'
+        foreach ($pair in @(@('DeepSeek Harness', $startBat), @($maintName, $maintTarget))) {
             $lnk = $ws.CreateShortcut((Join-Path $desktop "$($pair[0]).lnk"))
             $lnk.TargetPath = $pair[1]
             $lnk.WorkingDirectory = $CloudDir
             $lnk.Description = 'DeepSeek Harness on GitHub Codespaces'
+            if (Test-Path -LiteralPath $icon) { $lnk.IconLocation = $icon }
             $lnk.Save()
         }
-        Ok "桌面快捷方式：DeepSeek Harness / 更新 dsh"
+        Ok "桌面快捷方式：DeepSeek Harness / $maintName"
     }
 }
 else { Info '(dry-run) 跳过：写启动脚本、建桌面快捷方式' }
@@ -199,7 +234,13 @@ Write-Host ''
 Write-Host ' ✅ Installation complete ' -BackgroundColor Green -ForegroundColor Black
 Write-Host ''
 Write-Host "dsh-codespaces-kit v$KitVersion"
-Write-Host "以后启动：双击桌面「DeepSeek Harness」（使用期间别关那个最小化的 dsh tunnel 窗口）"
-Write-Host "升级 dsh：双击桌面「更新 dsh」"
+if ($DryRun -or $SkipShortcuts) {
+    Write-Host "以后启动：$(Join-Path $CloudDir 'start-dsh.bat')（使用期间别关那个最小化的 dsh tunnel 窗口）"
+    Write-Host "管理台：$(Join-Path $CloudDir 'console.bat')"
+} else {
+    Write-Host "以后启动：双击桌面「DeepSeek Harness」（使用期间别关那个最小化的 dsh tunnel 窗口）"
+    Write-Host "管理台：双击桌面「$maintName」—— 打开 dsh / 状态 / 体检 / 自动同步 / 更新 / 权限清单 / 修复 / 卸载"
+}
+Write-Host "升级 dsh：管理台 [5]，或直接跑 $(Join-Path $CloudDir 'update-dsh.bat')"
 Write-Host "看额度：https://github.com/settings/billing  ·  省额度：https://github.com/codespaces 点 Stop"
 Write-Host ''

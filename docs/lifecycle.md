@@ -17,10 +17,11 @@ dsh-codespaces uninstall   卸载 / 撤销（默认只预览）
 Windows 用 `install\dsh-codespaces.bat <命令>`，macOS/Linux 用 `install/dsh-codespaces.sh <命令>`；
 参数会原样传给对应的 `*.ps1` / `*.sh`。
 
-Windows 上还有一份图形化的**管理台**（`install\console.ps1` + `install\console.bat`），把这些命令做成了菜单：
+Windows 上还有一份图形化的**管理台**（`console.ps1` + `console.bat`），把这些命令做成了菜单：
 `[1]` 打开 dsh / `[2]` 状态 / `[3]` 体检 / `[4]` 自动同步 / `[5]` 更新 dsh / `[A]` 权限清单 /
-`[R]` 修复 / `[U]` 卸载 / `[L]` 同步日志，`[E]` 切中文 / English。它和这些脚本放在同一目录即可，
-所以直接在仓库的 `install\` 里双击最省事。
+`[R]` 修复 / `[U]` 卸载 / `[L]` 同步日志，`[E]` 切中文 / English。
+`setup.ps1` 会把它连同它调用的脚本一起装进 `%LOCALAPPDATA%\dsh-cloud\` 并建「dsh 管理台」快捷方式；
+在 clone 下来的仓库里双击 `install\console.bat` 是同一个界面。
 
 ## 什么时候用哪个
 
@@ -38,7 +39,7 @@ Windows 上还有一份图形化的**管理台**（`install\console.ps1` + `inst
 
 ```
 ╭──────────────────────────────────────────────────────────────────╮
-│ dsh-codespaces status                                     v1.7.1 │
+│ dsh-codespaces status                                     v1.7.2 │
 │ codespace                     your-codespace-name-here-gxq9gv9gx │
 ╰──────────────────────────────────────────────────────────────────╯
 

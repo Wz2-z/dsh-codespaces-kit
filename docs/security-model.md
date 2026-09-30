@@ -26,7 +26,7 @@ dsh-codespaces audit -Json  # 给脚本用
 | **Codespaces 平台令牌** | 容器 `/workspaces/.codespaces/shared/.env`（GitHub 自己放的） | 容器里的 git/gh 用它访问你的仓库；**随容器销毁自动失效** | 不用你撤销；删掉 Codespace 就没了 |
 | **DeepSeek API Key** | 容器 `~/.dsh/.credentials.yaml`（权限 0600） | 只有容器里的 dsh 用它调 DeepSeek；**不进仓库、不上传到别处** | 在 DeepSeek 控制台吊销该 key；文件随 Codespace 消失 |
 | **同步配置** `.dsh-cloud/` | 容器 `/workspaces/<仓库>/.dsh-cloud/`（持久卷） | `start.sh` / `update.sh` / `sync.sh` / `sync.conf`，**不含任何凭据** | `dsh-codespaces uninstall -Yes -Cloud -PurgeCloud` |
-| **桌面快捷方式 + `.bat`** | 本机桌面与 `%LOCALAPPDATA%\dsh-cloud\`（`start-dsh.bat` / `update-dsh.bat` / 管理台 `console.ps1`） | 只是启动器和菜单，里面**没有密钥**（只有路径和 Codespace 名字） | `dsh-codespaces uninstall -Yes -Local` |
+| **桌面快捷方式 + `.bat`** | 本机桌面与 `%LOCALAPPDATA%\dsh-cloud\`（`start-dsh.bat` / `update-dsh.bat` / 管理台 `console.ps1` + `status`·`doctor`·`audit`·`update`·`uninstall`） | 只是启动器和菜单，里面**没有密钥**（只有路径和 Codespace 名字） | `dsh-codespaces uninstall -Yes -Local` |
 
 ## 没有创建什么
 

@@ -5,13 +5,13 @@
 ```
 Host (Windows)
 ├── Desktop\DeepSeek Harness.lnk     start (created by setup.ps1)
-├── Desktop\更新 dsh.lnk             update (same)
+├── Desktop\dsh 管理台.lnk           menu: open dsh / status / checkup / sync / update / uninstall
 ├── %LOCALAPPDATA%\dsh-cloud\
 │   ├── gh\                          portable GitHub CLI (gh\bin\gh.exe)
 │   ├── ghconfig\                    gh's login token (plaintext; `gh auth logout` clears it)
-│   ├── start-dsh.bat / update-dsh.bat   what the shortcuts actually point at
+│   ├── start-dsh.bat / update-dsh.bat   the two launcher scripts
+│   ├── console.ps1 / console.bat    the control panel (+ the status/doctor/audit/update/uninstall it calls)
 │   └── *-log.txt                    output of the last start / update
-├── <kit>\install\console.ps1        the control panel (console.bat is its launcher)
 └── %USERPROFILE%\.ssh\dsh_cs_key    key used to SSH into the Codespace
 
 Container (Codespaces)

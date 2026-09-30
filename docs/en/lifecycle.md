@@ -15,10 +15,11 @@ dsh-codespaces uninstall   preview removal; nothing happens without -Yes/--yes
 On Windows use `install\dsh-codespaces.bat <command>`; on macOS/Linux `install/dsh-codespaces.sh <command>`.
 Arguments are passed straight through to the matching `*.ps1` / `*.sh`.
 
-On Windows there is also a graphical **control panel** (`install\console.ps1` + `install\console.bat`) that turns
+On Windows there is also a graphical **control panel** (`console.ps1` + `console.bat`) that turns
 these commands into a menu: `[1]` open dsh · `[2]` status · `[3]` checkup · `[4]` auto sync · `[5]` update dsh ·
 `[A]` credentials · `[R]` repair · `[U]` uninstall · `[L]` sync log, with `[E]` switching 中文 / English.
-It calls those scripts from its own folder, so double-clicking it inside the kit's `install\` is the simple path.
+`setup.ps1` installs it — together with the scripts it calls — into `%LOCALAPPDATA%\dsh-cloud\` and creates the
+"dsh 管理台" desktop shortcut; double-clicking `install\console.bat` inside a clone is the same panel.
 
 ## Which one, when
 
@@ -36,7 +37,7 @@ It calls those scripts from its own folder, so double-clicking it inside the kit
 
 ```
 ╭──────────────────────────────────────────────────────────────────╮
-│ dsh-codespaces status                                     v1.7.1 │
+│ dsh-codespaces status                                     v1.7.2 │
 │ codespace                     your-codespace-name-here-gxq9gv9gx │
 ╰──────────────────────────────────────────────────────────────────╯
 

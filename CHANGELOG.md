@@ -4,11 +4,28 @@
 发新版时改三处：本文件、[`VERSION`](VERSION)、`install/` 下所有脚本里的版本串
 （`KIT_VERSION` / `$KitVersion` / `console.ps1` 的 `$Version`）。
 
-## [未发布] - 2026-09-30
+## [1.7.2] - 2026-09-30
 
-文档追上 v1.7.0 / v1.7.1 已经上线的功能，外加管理台的一处小修：
+管理台进安装器 + 文档追上 v1.7.0 / v1.7.1 已经上线的功能。
 
-- README（中文 / 英文）版本号从 `v1.7.0` 更到 **`v1.7.1`**，`status` 示例里的版本号一并更新
+**安装器（Windows）**：`setup.ps1` 现在把管理台一起装好，装完就和手动配好的一样 ——
+桌面两个快捷方式「DeepSeek Harness」+「dsh 管理台」。
+
+- `%LOCALAPPDATA%\dsh-cloud\` 里多放 8 个文件：`console.ps1`（管理台）、`console.bat`（启动器）
+  以及它调用的 `status.ps1` / `doctor.ps1` / `audit.ps1` / `update.ps1` / `uninstall.ps1` / `cloud-setup.sh`
+  （管理台按同目录找这些脚本，所以必须放一起）
+- 取文件的顺序：本地这份 `install\` 里有就直接拷（clone 下来跑的场合），只有一份 `setup.ps1` 时
+  按 `raw.githubusercontent` 取；某一个没拿到就 `!` 提示并在桌面回退成原来的「更新 dsh」，
+  下次重跑 `setup.ps1` 会补上（不会留一个点不开的快捷方式）
+- 桌面快捷方式从「DeepSeek Harness」+「更新 dsh」改成 **「DeepSeek Harness」+「dsh 管理台」**；
+  老机器上已有的「更新 dsh」快捷方式不动（doctor 两个都认）
+- 顺手：`%LOCALAPPDATA%\dsh-cloud\icons\dsh.ico` 存在时，快捷方式会带上这个图标
+  （仓库里不带图标文件，保持 MIT/CC 的干净）
+
+**文档**：
+
+- README（中文 / 英文）与 `install/README.md` 的版本号更到 **`v1.7.2`**（之前还停在 v1.7.0 / 1.0.0），
+  `status` 示例里的版本号一并更新
 - 把仓库自带的 **Windows 管理台**（`install/console.ps1` + `console.bat`）写进文档：
   主 README 补了菜单清单和日常入口，`docs/lifecycle.md` / `docs/en/lifecycle.md` 加了命令对照，
   `install/README.md` 补了用法、行为和 `-Action` / `-Lang` 参数

@@ -2,7 +2,7 @@
 # dsh-codespaces status（macOS / Linux 本机）
 # 用法： bash install/status.sh [--base=DIR] [--key=PATH] [--codespace=NAME] [--quick] [--json]
 set -u
-KIT_VERSION="1.7.1"
+KIT_VERSION="1.7.2"
 CLOUD_STATUS_URL="https://raw.githubusercontent.com/Wz2-z/dsh-codespaces-kit/main/install/cloud-status.sh"
 BASE=""; KEY="$HOME/.ssh/dsh_cs_key"; CS=""; QUICK=0; JSON=0
 while [ $# -gt 0 ]; do

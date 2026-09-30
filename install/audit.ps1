@@ -18,7 +18,7 @@ param(
     [switch]$Json
 )
 $ErrorActionPreference = 'Continue'
-$KitVersion = '1.7.1'
+$KitVersion = '1.7.2'
 $CloudAuditUrl = 'https://raw.githubusercontent.com/Wz2-z/dsh-codespaces-kit/main/install/cloud-audit.sh'
 try { [Console]::OutputEncoding = [Text.Encoding]::UTF8 } catch {}
 try { $OutputEncoding = [Text.Encoding]::UTF8 } catch {}

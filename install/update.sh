@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # dsh-codespaces update（macOS / Linux）—— 升级云端 dsh 并重建隧道
 set -u
-KIT_VERSION="1.7.1"
+KIT_VERSION="1.7.2"
 BASE=""; KEY="$HOME/.ssh/dsh_cs_key"; CS=""; NO_OPEN=0
 while [ $# -gt 0 ]; do
   case "$1" in

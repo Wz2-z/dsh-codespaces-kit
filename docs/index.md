@@ -15,7 +15,7 @@ title: dsh on GitHub Codespaces
 - [部署指南（主 README）](https://github.com/Wz2-z/dsh-codespaces-kit/blob/main/README.md) —— 30 秒了解 → 安装 → 配置 → 日常使用
 - [一键安装脚本](https://github.com/Wz2-z/dsh-codespaces-kit/tree/main/install) —— `setup.ps1` / `setup.sh`，装完打印 `✅ Installation complete`
 - [体检：doctor](doctor.md) —— 12 项检查，坏了看哪一行
-- [生命周期](lifecycle.md) —— `status` / `setup` / `repair` / `update` / `uninstall`，以及 Windows 管理台 `install\console.ps1`
+- [生命周期](lifecycle.md) —— `status` / `setup` / `repair` / `update` / `uninstall`，以及 Windows 管理台（安装器会建桌面快捷方式）
 - [安全模型](security-model.md) —— 创建了哪些 key/token/config，各自能干什么、怎么撤销
 
 ## 深入

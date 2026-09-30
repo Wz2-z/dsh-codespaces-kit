@@ -1,6 +1,6 @@
 # 一键安装
 
-> [← 回到 README](../README.md) · 版本：[`1.7.1`](../CHANGELOG.md)
+> [← 回到 README](../README.md) · 版本：[`1.7.2`](../CHANGELOG.md)
 
 对应 README 里的**路线 A**。两个入口，选一个：
 
@@ -27,8 +27,9 @@ Windows：`install\dsh-codespaces.bat <命令>`；macOS / Linux：`bash install/
 
 ## 管理台（Windows）：`console.ps1` + `console.bat`
 
-不习惯记命令就用这个 —— 仓库里的 `install\console.bat` 双击即开（也可以在任意终端里跑
-`powershell -ExecutionPolicy Bypass -File install\console.ps1`）：
+不习惯记命令就用这个。`setup.ps1` 会把它装好，桌面直接有「dsh 管理台」快捷方式；
+在 clone 下来的仓库里双击 `install\console.bat` 也是同一个东西
+（等价于 `powershell -ExecutionPolicy Bypass -File install\console.ps1`）：
 
 ```
 [1] 打开 dsh   [2] 状态    [3] 体检    [4] 自动同步   [5] 更新 dsh
@@ -38,9 +39,14 @@ Windows：`install\dsh-codespaces.bat <命令>`；macOS / Linux：`bash install/
 
 - 顶部是自检：Codespace 名字 / 状态、同步模式与开关、待提交文件数、上次推送时间
 - `[E]` 在中文 / English 之间切换，选择记在同目录的 `.console-lang`，下次打开保持
-- 每个动作都是调本目录里对应的脚本（`status.ps1` / `doctor.ps1` / `update.ps1` / `uninstall.ps1` …），
-  并把 `-Base` / `-Key` / `-Lang` 透传下去 —— 所以**这些脚本要和管理台放在同一个目录**，
-  直接在仓库的 `install\` 里用最省事
+- 每个动作都是调同目录里对应的脚本（`status.ps1` / `doctor.ps1` / `update.ps1` / `uninstall.ps1` …），
+  并把 `-Base` / `-Key` / `-Lang` 透传下去 —— 所以**这些脚本要和管理台放在同一个目录**
+- `setup.ps1` 装到 `%LOCALAPPDATA%\dsh-cloud\` 的就是这一组 8 个文件：
+  `console.ps1` / `console.bat` / `status.ps1` / `doctor.ps1` / `audit.ps1` / `update.ps1` /
+  `uninstall.ps1` / `cloud-setup.sh`（最后一个是「修复」用的）
+- 只有一份 `setup.ps1` 时（`irm` 那种装法）这些文件按 `raw.githubusercontent` 取；某一个没拿到就 `!`
+  提示、快捷方式回退成「更新 dsh」，重跑一次 `setup.ps1` 会补上
+- `-SkipShortcuts` 只跳过桌面快捷方式，管理台文件照样装
 - 常见参数：`-Action status` 直接执行某个动作（不给就进菜单）、`-Action preview` 只渲染一次菜单、
   `-Lang en` 用英文界面、`-Base` / `-Key` 手动指定 gh 与私钥、`-CloudDir` 手动指定云端脚本目录
   （默认按 Codespace 所属仓库名推出 `/workspaces/<repo>/.dsh-cloud`，推不出来会去容器里找一次）
