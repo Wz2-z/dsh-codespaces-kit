@@ -21,7 +21,7 @@ param(
     [ValidateSet('zh', 'en', '')][string]$Lang = ''
 )
 $ErrorActionPreference = 'Continue'
-$Version = '1.7.0'
+$Version = '1.7.1'
 try { [Console]::OutputEncoding = [Text.Encoding]::UTF8 } catch {}
 try { $OutputEncoding = [Text.Encoding]::UTF8 } catch {}
 

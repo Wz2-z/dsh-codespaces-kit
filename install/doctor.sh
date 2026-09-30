@@ -6,7 +6,7 @@
 # =============================================================================
 set -u
 
-KIT_VERSION="1.7.0"
+KIT_VERSION="1.7.1"
 CLOUD_DOCTOR_URL="https://raw.githubusercontent.com/Wz2-z/dsh-codespaces-kit/main/install/cloud-doctor.sh"
 
 REPO=""; CODESPACE=""; KEY="$HOME/.ssh/dsh_cs_key"; NO_TUNNEL=0; JSON=0

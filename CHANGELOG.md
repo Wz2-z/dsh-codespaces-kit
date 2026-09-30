@@ -3,6 +3,17 @@
 版本号规则：`MAJOR.MINOR.PATCH`（[语义化版本](https://semver.org/lang/zh-CN/)）。
 发新版时改三处：本文件、[`VERSION`](VERSION)、`install/setup.ps1` 与 `install/setup.sh` 里的 `KIT_VERSION`。
 
+## [1.7.1] - 2026-09-29
+
+修一个我自己引入的启动器 bug（v1.7.0 里）：
+
+- `install/console.bat` 只会找同目录的 `console.ps1`，而旧机器上那份叫 `dsh-console.ps1`，
+  于是双击报 *The argument ... console.ps1 to the -File parameter does not exist*
+- 现在按 `console.ps1` → `dsh-console.ps1` 的顺序找，两个名字都能用；
+  两个都找不到时打印"把 kit 的 `install/console.ps1` 拷到同目录"并停下来，而不是抛一段 PowerShell 报错
+- 你机器上现在是这样：`outputs\console.ps1`（真正的面板）+ `outputs\dsh-console.bat`（启动器，
+  桌面快捷方式指的就是它）
+
 ## [1.7.0] - 2026-09-29
 
 控制台双语 + 版本号修正。

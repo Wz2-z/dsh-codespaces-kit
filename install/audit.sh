@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # dsh-codespaces audit（macOS / Linux 本机）—— 凭据 / 权限清单，不打印任何密钥内容
 set -u
-KIT_VERSION="1.7.0"
+KIT_VERSION="1.7.1"
 CLOUD_AUDIT_URL="https://raw.githubusercontent.com/Wz2-z/dsh-codespaces-kit/main/install/cloud-audit.sh"
 BASE=""; KEY="$HOME/.ssh/dsh_cs_key"; CS=""; JSON=0
 while [ $# -gt 0 ]; do
