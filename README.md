@@ -4,7 +4,7 @@
 
 在云端跑官方 dsh，本机只负责开一条 SSH 隧道 —— 成果自动备份到你自己的私有仓库。
 
-版本 [`v1.7.0`](CHANGELOG.md) · 一键安装脚本在 [`install/`](install/) · 控制台支持中文 / English 切换
+版本 [`v1.7.1`](CHANGELOG.md) · 一键安装脚本在 [`install/`](install/) · 管理台支持中文 / English 切换
 
 | | |
 | --- | --- |
@@ -121,10 +121,23 @@ AI 会让你运行一次 `gh auth login`，屏幕上会出现一个**一次性�
 
 #### 第 5 步：以后就双击
 
-AI 会在桌面放两个快捷方式（图标是 dsh 官方 logo）：
+安装器会在桌面放两个快捷方式（图标是 dsh 官方 logo）：
 
 - **DeepSeek Harness**：启动（唤醒 Codespace → 拉起 dsh → 建隧道 → 打开浏览器）
 - **更新 dsh**：把云端 dsh 升级到最新版
+
+想把维护动作也收在一处，就用仓库自带的 **Windows 管理台** —— 在 clone 下来的仓库里双击
+`install\console.bat`（等价于 `powershell -ExecutionPolicy Bypass -File install\console.ps1`）：
+
+```
+[1] 打开 dsh   [2] 状态    [3] 体检    [4] 自动同步   [5] 更新 dsh
+[A] 权限清单   [R] 修复    [U] 卸载    [L] 同步日志   [F] 刷新
+[E] 语言 / language                                   [0] 退出
+```
+
+菜单带自检（顶部显示 Codespace 状态、同步模式、待提交、上次推送），`[E]` 可以随时切中文 / English。
+管理台需要和 `status.ps1` / `doctor.ps1` / `update.ps1` 等脚本放在同一个目录，所以直接在仓库的
+`install\` 里用最省事（想让快捷方式指过去也行）。
 
 使用期间不要关那个最小化的 `dsh tunnel` 黑窗口。
 
@@ -165,7 +178,8 @@ AI 会在桌面放两个快捷方式（图标是 dsh 官方 logo）：
 | 想做什么 | 怎么做 |
 | --- | --- |
 | 启动 | 双击桌面「DeepSeek Harness」 |
-| 升级 dsh | 双击桌面「更新 dsh」 |
+| 打开管理台（Windows） | 双击仓库里的 `install\console.bat`：打开 dsh / 状态 / 体检 / 同步 / 更新 / 清单 / 修复 / 卸载，一屏菜单 |
+| 升级 dsh | 双击桌面「更新 dsh」，或管理台 `[5]` |
 | 立刻同步一次 | 云端执行 `bash /workspaces/<repo>/.dsh-cloud/sync.sh --now` |
 | 看同步状态 / 待提交的改动 | 点侧边栏的同步按钮，或 `bash .dsh-cloud/sync.sh --status` |
 | 换同步模式（智能批量 / 固定周期 / 只手动） | `bash .dsh-cloud/sync.sh --mode=idle\|interval\|manual` |
@@ -190,7 +204,7 @@ AI 会在桌面放两个快捷方式（图标是 dsh 官方 logo）：
 任何时候觉得"哪里不对"，先跑这个：
 
 ```powershell
-# Windows（也可以双击桌面「dsh 体检」）
+# Windows（也可以走管理台 `install\console.bat` → [3] 体检）
 powershell -ExecutionPolicy Bypass -File install\doctor.ps1
 ```
 
@@ -220,6 +234,7 @@ Launcher                 ✓  桌面有 DeepSeek Harness / 更新 dsh
 - 前 4 项是本机侧，中间 6 项由本机把 `install/cloud-doctor.sh` 送进容器执行，最后 2 项是本机侧的隧道与启动器
 - `✓` 正常 / `!` 警告（能用，看一眼）/ `✗` 坏了（上面写着怎么修）；有 `✗` 时退出码为 1
 - `-NoTunnel`（PowerShell）/ `--no-tunnel`（bash）跳过隧道检查；`-Json` / `--json` 输出 JSON
+- `-Lang zh|en`（Windows 的 `status` / `doctor` / `audit`，默认 `zh`）切换输出语言，管理台会把 `[E]` 的选择透传下去
 - 每一项对应的修法见 [docs/doctor.md](docs/doctor.md)
 
 ## 生命周期与安全清单
@@ -238,7 +253,7 @@ dsh-codespaces uninstall   卸载 / 撤销（默认只预览，要 -Yes + 范围
 
 ```
 ╭──────────────────────────────────────────────────────────────────╮
-│ dsh-codespaces status                                     v1.7.0 │
+│ dsh-codespaces status                                     v1.7.1 │
 │ codespace                     your-codespace-name-here-gxq9gv9gx │
 ╰──────────────────────────────────────────────────────────────────╯
 
@@ -278,7 +293,10 @@ dsh-codespaces uninstall   卸载 / 撤销（默认只预览，要 -Yes + 范围
 | 路径 | 内容 |
 | --- | --- |
 | `README.md` | 本文件：快速安装 + 配置 + 日常使用 |
+| `README.en.md` / `docs/en/` | 英文版（和中文一一对应） |
 | `install/` | 一键安装：`setup.ps1`（Windows）/ `setup.sh`（macOS、Linux）/ `cloud-setup.sh`（云端 8 步） |
+| `install/dsh-codespaces.bat` / `.sh` | 统一入口：`status` / `doctor` / `audit` / `setup` / `repair` / `update` / `uninstall` |
+| `install/console.ps1` / `console.bat` | Windows 管理台（菜单 + 顶部自检，中文 / English 可切） |
 | `docs/ai-prompt.md` | 给 AI 的任务书（复制这段） |
 | `docs/ai-runbook.md` | 技术细节：云端 / 本机命令 + 验收标准 |
 | `docs/cloud-scripts.md` | 云端三个脚本（`start.sh` / `update.sh` / `sync.sh`）精简版参考 |
@@ -296,6 +314,9 @@ dsh-codespaces uninstall   卸载 / 撤销（默认只预览，要 -Yes + 范围
 | `tools/squash-autosync.sh` | 把历史上连续的 `auto-sync` 提交合并掉（默认只预览，会建备份分支） |
 | `VERSION` / `CHANGELOG.md` | 版本号与更新日志 |
 
+文档站（GitHub Pages）：<https://wz2-z.github.io/dsh-codespaces-kit/>（中文）·
+<https://wz2-z.github.io/dsh-codespaces-kit/en/>（English）
+
 ---
 
 **一句话总结**：云端跑 agent、隧道回本机、仓库做备份、脚本做自动化。
@@ -303,7 +324,7 @@ dsh-codespaces uninstall   卸载 / 撤销（默认只预览，要 -Yes + 范围
 
 ## 许可证
 
-- **代码**（`plugins/`、`tools/`）：[MIT](LICENSE)
+- **代码**（`install/`、`plugins/`、`tools/`）：[MIT](LICENSE)
 - **文档**（本 README 等说明文字）：[CC BY 4.0](LICENSE-docs)，可自由复制、修改、转发，保留署名即可。
 
 - **作者**：[@Wz2-z](https://github.com/Wz2-z)

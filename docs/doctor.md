@@ -33,7 +33,7 @@ bash install/doctor.sh
 | Sync config | 容器 | `sync.conf` 里有合法的 mode | 跑 `cloud-setup.sh` 生成默认值 |
 | dsh web | 容器 | 3080 在监听且需要 token（401） | `bash .dsh-cloud/start.sh`；看 `~/dsh-web.log` |
 | Tunnel | 本机 | `127.0.0.1:3080` 能通 | 双击桌面启动器；或 `gh codespace ports forward 3080:3080` |
-| Launcher | 本机 | 桌面有启动器 | `install/setup.ps1` / `setup.sh` 重新生成 |
+| Launcher | 本机 | 桌面有启动入口（`DeepSeek Harness`）**和**维护入口（`dsh 管理台` 或 `更新 dsh`，任一即可） | `install/setup.ps1` / `setup.sh` 重新生成；快捷方式指向的脚本被挪走会报 `!` |
 
 ## 三种状态的读法
 
@@ -48,8 +48,9 @@ bash install/doctor.sh
 | 参数 | 作用 |
 | --- | --- |
 | `-Base <目录>`（Windows） | 一整套东西放在一起的目录（里面应有 `gh\bin\gh.exe` 和 `ghconfig\`） |
-| `-Gh <路径>` / `--key <路径>` | 手动指定 gh / 私钥 |
-| `-Key <路径>` | 手动指定私钥 |
+| `-Gh <路径>`（Windows） | 手动指定便携版 gh |
+| `-Key <路径>` / `--key <路径>` | 手动指定 SSH 私钥 |
+| `-Lang zh\|en`（Windows，默认 `zh`） | 输出语言；管理台 `[E]` 选的语言会透传进来（`status` / `audit` 同样支持） |
 | `-NoTunnel` / `--no-tunnel` | 跳过隧道检查（快一点，但看不到 Tunnel 那一项的真实结果） |
 | `-Json` / `--json` | 输出 JSON，给别的脚本用 |
 

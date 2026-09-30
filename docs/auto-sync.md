@@ -84,7 +84,8 @@ bash /workspaces/<repo>/.dsh-cloud/sync.sh --mode=manual
 
 1. **dsh 侧边栏的同步按钮**（装了 [`dsh-sync-panel`](https://github.com/Wz2-z/dsh-codespaces-kit/tree/main/plugins/dsh-sync-panel) 就有）——
    点开就是模式、待提交、最近提交、日志，外加暂停/恢复/立即提交/切模式；
-2. **Windows 桌面快捷方式「dsh 同步」**（`outputs/同步控制台.bat`）—— 菜单式，不用开终端；
+2. **Windows 管理台**（仓库里的 `install\console.bat` → `[4] 自动同步`）——
+   菜单式，不用开终端：状态 / 立即提交 / 暂停 / 恢复 / 三种模式 / 折叠窗口开关；
 3. **命令行**（最全，容器里的 `sync.sh`）。
 
 命令行里的东西：

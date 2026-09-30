@@ -1,7 +1,31 @@
 # 更新日志
 
 版本号规则：`MAJOR.MINOR.PATCH`（[语义化版本](https://semver.org/lang/zh-CN/)）。
-发新版时改三处：本文件、[`VERSION`](VERSION)、`install/setup.ps1` 与 `install/setup.sh` 里的 `KIT_VERSION`。
+发新版时改三处：本文件、[`VERSION`](VERSION)、`install/` 下所有脚本里的版本串
+（`KIT_VERSION` / `$KitVersion` / `console.ps1` 的 `$Version`）。
+
+## [未发布] - 2026-09-30
+
+文档追上 v1.7.0 / v1.7.1 已经上线的功能，外加管理台的一处小修：
+
+- README（中文 / 英文）版本号从 `v1.7.0` 更到 **`v1.7.1`**，`status` 示例里的版本号一并更新
+- 把仓库自带的 **Windows 管理台**（`install/console.ps1` + `console.bat`）写进文档：
+  主 README 补了菜单清单和日常入口，`docs/lifecycle.md` / `docs/en/lifecycle.md` 加了命令对照，
+  `install/README.md` 补了用法、行为和 `-Action` / `-Lang` 参数
+- `-Lang zh|en`（v1.7.0 加的）补进 `docs/doctor.md` / `docs/en/doctor.md` 的参数表和
+  lifecycle 的参数说明
+- doctor 的 Launcher 一项改成现在的判定：**启动入口 + 维护入口（`dsh 管理台` 或 `更新 dsh`）**，
+  并且会检查快捷方式指向的脚本还在不在（v1.4.2 的行为，文档这次才对齐）
+- 清掉过期的路径引用：`docs/auto-sync.md` 的「桌面快捷方式 dsh 同步 / `outputs/同步控制台.bat`」
+  改成管理台 `[4] 自动同步`；`docs/directory-layout.md` 的本机布局改成 `%LOCALAPPDATA%\dsh-cloud\`；
+  `docs/security-model.md` / `docs/en/security-model.md` 里的 `outputs\` 一并更正
+- `install/README.md` 顶部版本号从 `1.0.0` 更正为当前版本；发版清单改成
+  "`install/` 下所有脚本里的版本串（`KIT_VERSION` / `$KitVersion` / `console.ps1` 的 `$Version`）都要改"
+- **管理台修一处硬编码**：`install/console.ps1` 里的 `$CloudDir` 原来写死成作者的仓库路径，
+  现在默认按 Codespace 所属仓库名推 `/workspaces/<repo>/.dsh-cloud`（`gh codespace list
+  --json name,repository`），推不出来会去容器里 `ls -d /workspaces/*/.dsh-cloud` 找一次；
+  也可以用新的 `-CloudDir` 参数手动指定。找不到时「打开 dsh」「自动同步」会打印一句提示而不是静默失败
+  —— 换别人的仓库名也能直接用管理台
 
 ## [1.7.1] - 2026-09-29
 

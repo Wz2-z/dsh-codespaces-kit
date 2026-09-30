@@ -77,7 +77,8 @@ bash /workspaces/<repo>/.dsh-cloud/sync.sh --mode=manual
 There is **no GUI** for sync itself, but three ways to see it:
 
 1. the `dsh-sync-panel` plugin (a sync button in the dsh sidebar),
-2. a desktop menu (if your installer created one),
+2. the Windows control panel in the kit (`install\console.bat` → `[4] auto sync`): status / commit now / pause /
+   resume / the three modes / the fold window,
 3. the CLI above, inside the container.
 
 Log line meanings: `pushed` (pushed), `folded into previous auto-commit`, `skipped` (a run with no net change),

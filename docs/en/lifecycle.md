@@ -15,6 +15,11 @@ dsh-codespaces uninstall   preview removal; nothing happens without -Yes/--yes
 On Windows use `install\dsh-codespaces.bat <command>`; on macOS/Linux `install/dsh-codespaces.sh <command>`.
 Arguments are passed straight through to the matching `*.ps1` / `*.sh`.
 
+On Windows there is also a graphical **control panel** (`install\console.ps1` + `install\console.bat`) that turns
+these commands into a menu: `[1]` open dsh · `[2]` status · `[3]` checkup · `[4]` auto sync · `[5]` update dsh ·
+`[A]` credentials · `[R]` repair · `[U]` uninstall · `[L]` sync log, with `[E]` switching 中文 / English.
+It calls those scripts from its own folder, so double-clicking it inside the kit's `install\` is the simple path.
+
 ## Which one, when
 
 | Situation | Command |
@@ -31,7 +36,7 @@ Arguments are passed straight through to the matching `*.ps1` / `*.sh`.
 
 ```
 ╭──────────────────────────────────────────────────────────────────╮
-│ dsh-codespaces status                                     v1.7.0 │
+│ dsh-codespaces status                                     v1.7.1 │
 │ codespace                     your-codespace-name-here-gxq9gv9gx │
 ╰──────────────────────────────────────────────────────────────────╯
 
@@ -49,7 +54,8 @@ Arguments are passed straight through to the matching `*.ps1` / `*.sh`.
 Status words: `Healthy` tunnel up and dsh wants a token (401 is normal) · `Down` unreachable ·
 `Degraded` reachable but odd · `Running` / `Paused` / `Stopped` for the sync daemon.
 
-`--quick` (bash) / `-Quick` (PowerShell) skips the tunnel probe; `--json` / `-Json` is for scripts.
+`--quick` (bash) / `-Quick` (PowerShell) skips the tunnel probe; `--json` / `-Json` is for scripts;
+`-Lang zh|en` (Windows, default `zh`) switches the output language of `status` / `doctor` / `audit`.
 
 ## What `repair` does
 

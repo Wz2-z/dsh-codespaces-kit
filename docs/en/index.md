@@ -14,7 +14,7 @@ tunnel, and keep the workspace backed up in your own private repo.
 - [Main README (English)](https://github.com/Wz2-z/dsh-codespaces-kit/blob/main/README.en.md) — 30-second overview → install → configure → daily use
 - [One-shot installer](https://github.com/Wz2-z/dsh-codespaces-kit/tree/main/install) — `setup.ps1` / `setup.sh`, ends with `✅ Installation complete`
 - [Checkup: doctor](doctor.md) — the 12 checks and what to do when one fails
-- [Lifecycle](lifecycle.md) — `status` / `setup` / `repair` / `update` / `uninstall`
+- [Lifecycle](lifecycle.md) — `status` / `setup` / `repair` / `update` / `uninstall`, plus the Windows control panel (`install\console.ps1`)
 - [Security model](security-model.md) — every key/token/config this tool creates, what it can do, how to revoke it
 
 ## Go deeper

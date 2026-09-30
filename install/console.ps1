@@ -17,6 +17,7 @@ param(
     [string]$Base,
     [string]$Key,
     [string]$Codespace,
+    [string]$CloudDir,
     [string]$Action,
     [ValidateSet('zh', 'en', '')][string]$Lang = ''
 )
@@ -73,6 +74,7 @@ $S = if ($Lang -eq 'en') {
         step3 = '  [3/3] starting the tunnel and opening the browser …'
         waking = '      waking it up, about one minute …'
         missing = 'missing'; repairRun = '  re-running the cloud installer (idempotent) …'
+        cloudDirMissing = 'could not locate the cloud scripts (/workspaces/<repo>/.dsh-cloud) — pass -CloudDir, or run cloud-setup.sh in the container once'
     }
 } else {
     @{
@@ -109,6 +111,7 @@ $S = if ($Lang -eq 'en') {
         step3 = '  [3/3] 建隧道并打开浏览器 …'
         waking = '      正在唤醒，约 1 分钟 …'
         missing = '缺少'; repairRun = '  重跑一遍云端安装（幂等：只补缺的）…'
+        cloudDirMissing = '没找到云端脚本目录（/workspaces/<repo>/.dsh-cloud）—— 用 -CloudDir 指定，或先在容器里跑一次 cloud-setup.sh'
     }
 }
 
@@ -122,7 +125,8 @@ if (-not $Base) { $Base = Join-Path $env:LOCALAPPDATA 'dsh-cloud' }
 if (-not $Key) { $Key = Join-Path $env:USERPROFILE '.ssh\dsh_cs_key' }
 $Gh = Join-Path $Base 'gh\bin\gh.exe'
 $GhConfig = Join-Path $Base 'ghconfig'
-$CloudDir = '/workspaces/dsh-box/.dsh-cloud'
+# 云端脚本所在目录（持久卷）。给了 -CloudDir 就用它，否则按 Codespace 所属的仓库名推出来
+$script:CloudDir = $CloudDir
 if (Test-Exists $GhConfig) { $env:GH_CONFIG_DIR = $GhConfig }
 
 $script:Ctx = @{ Codespace = $Codespace; State = ''; Mode = ''; Enabled = ''; Daemon = ''; Pending = ''; LastPush = '' }
@@ -140,10 +144,27 @@ function Resolve-Codespace {
     $first = $list | Select-Object -First 1
     if ($first) { $script:Ctx.Codespace = $first.name; $script:Ctx.State = $first.state }
 }
+function Resolve-CloudDir {
+    # /workspaces/<repo>/.dsh-cloud —— 先从 gh 的 Codespace 列表里读仓库名，读不到就问容器自己
+    if ($script:CloudDir) { return }
+    if (-not $script:Ctx.Codespace) { return }
+    try {
+        $info = & $Gh codespace list --json name,repository 2>$null | ConvertFrom-Json |
+                Where-Object { $_.name -eq $script:Ctx.Codespace } | Select-Object -First 1
+        if ($info -and $info.repository) {
+            $repoName = ($info.repository -split '/')[-1]
+            if ($repoName) { $script:CloudDir = "/workspaces/$repoName/.dsh-cloud"; return }
+        }
+    } catch {}
+    foreach ($line in (Get-Remote "ls -d /workspaces/*/.dsh-cloud 2>/dev/null | head -n 1")) {
+        if ($line -match '^(/workspaces/[^/]+/\.dsh-cloud)') { $script:CloudDir = $matches[1]; return }
+    }
+}
 function Update-HeaderData {
     Resolve-Codespace
     if (-not $script:Ctx.Codespace) { return }
-    foreach ($line in (Get-Remote "bash $CloudDir/sync.sh --status 2>/dev/null | head -2")) {
+    Resolve-CloudDir
+    foreach ($line in (Get-Remote "bash $($script:CloudDir)/sync.sh --status 2>/dev/null | head -2")) {
         if ($line -match '模式：(\S+?)（enabled=(\w+)）') { $script:Ctx.Mode = $matches[1]; $script:Ctx.Enabled = $matches[2] }
     }
     $i = 0
@@ -241,7 +262,8 @@ function Action-Open {
         & $Gh codespace start -c $cs.name 2>&1 | Out-Null
     } else { Line '      Available' Green }
     Line $S.step2 'DarkGray'
-    $out = Get-Remote "bash $CloudDir/start.sh"
+    if (-not $script:CloudDir) { Line "  $($S.cloudDirMissing)" Red; return }
+    $out = Get-Remote "bash $($script:CloudDir)/start.sh"
     foreach ($line in $out) { Line "      $line" Gray }
     Line $S.step3 'DarkGray'
     Start-Process -FilePath $Gh -ArgumentList @('codespace', 'ports', 'forward', '3080:3080', '-c', $cs.name) -WindowStyle Hidden
@@ -274,7 +296,8 @@ function Action-Sync {
         if ($c -eq '0' -or -not $c) { return }
         if (-not $map[$c]) { continue }
         Line ''
-        foreach ($line in (Get-Remote "bash $CloudDir/sync.sh $($map[$c])")) { Line "  $line" Gray }
+        if (-not $script:CloudDir) { Line "  $($S.cloudDirMissing)" Red; Read-Host $S.pressEnter | Out-Null; continue }
+        foreach ($line in (Get-Remote "bash $($script:CloudDir)/sync.sh $($map[$c])")) { Line "  $line" Gray }
         $script:Ctx.Mode = ''
         Update-HeaderData
         Read-Host $S.pressEnter | Out-Null

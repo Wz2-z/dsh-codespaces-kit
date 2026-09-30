@@ -17,6 +17,11 @@ dsh-codespaces uninstall   卸载 / 撤销（默认只预览）
 Windows 用 `install\dsh-codespaces.bat <命令>`，macOS/Linux 用 `install/dsh-codespaces.sh <命令>`；
 参数会原样传给对应的 `*.ps1` / `*.sh`。
 
+Windows 上还有一份图形化的**管理台**（`install\console.ps1` + `install\console.bat`），把这些命令做成了菜单：
+`[1]` 打开 dsh / `[2]` 状态 / `[3]` 体检 / `[4]` 自动同步 / `[5]` 更新 dsh / `[A]` 权限清单 /
+`[R]` 修复 / `[U]` 卸载 / `[L]` 同步日志，`[E]` 切中文 / English。它和这些脚本放在同一目录即可，
+所以直接在仓库的 `install\` 里双击最省事。
+
 ## 什么时候用哪个
 
 | 情况 | 用哪个 |
@@ -33,11 +38,11 @@ Windows 用 `install\dsh-codespaces.bat <命令>`，macOS/Linux 用 `install/dsh
 
 ```
 ╭──────────────────────────────────────────────────────────────────╮
-│ dsh-codespaces status                                     v1.7.0 │
-│ codespace                     fluffy-space-meme-gxq9gv9gx4g63gvj │
+│ dsh-codespaces status                                     v1.7.1 │
+│ codespace                     your-codespace-name-here-gxq9gv9gx │
 ╰──────────────────────────────────────────────────────────────────╯
 
-│ Codespace   Running   fluffy-…（Available）
+│ Codespace   Running   your-codespace…（Available）
 │ Tunnel      Healthy   127.0.0.1:3080 → 401（需要 token，正常）
 │ DSH         Healthy   0.1.7-rc.2 · pid 62857 · HTTP 401
 │ Auto sync   Running   idle · on · daemon pid 90277 · 静默 600s · 折叠 1800s
@@ -55,7 +60,8 @@ Windows 用 `install\dsh-codespaces.bat <命令>`，macOS/Linux 用 `install/dsh
 - `Last check` 是同步守护进程**最后一次活动**的时间（不是"检查过没变化"的精确时间，够用）
 - `Last push` 取自 `~/dsh-sync.log` 里最后一次 `pushed` / `folded`
 
-`--quick`（bash）/ `-Quick`（PowerShell）跳过隧道检查，1～2 秒出结果；`--json` / `-Json` 给脚本用。
+`--quick`（bash）/ `-Quick`（PowerShell）跳过隧道检查，1～2 秒出结果；`--json` / `-Json` 给脚本用；
+`-Lang zh|en`（Windows 的 `status` / `doctor` / `audit`，默认 `zh`）切换输出语言。
 
 ## `repair` 做什么
 

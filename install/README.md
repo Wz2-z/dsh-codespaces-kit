@@ -1,6 +1,6 @@
 # 一键安装
 
-> [← 回到 README](../README.md) · 版本：[`1.0.0`](../CHANGELOG.md)
+> [← 回到 README](../README.md) · 版本：[`1.7.1`](../CHANGELOG.md)
 
 对应 README 里的**路线 A**。两个入口，选一个：
 
@@ -24,6 +24,26 @@ dsh-codespaces uninstall   卸载 / 撤销（默认只预览）
 
 Windows：`install\dsh-codespaces.bat <命令>`；macOS / Linux：`bash install/dsh-codespaces.sh <命令>`。
 每个命令也可以直接用对应的 `*.ps1` / `*.sh`（参数会原样透传）。
+
+## 管理台（Windows）：`console.ps1` + `console.bat`
+
+不习惯记命令就用这个 —— 仓库里的 `install\console.bat` 双击即开（也可以在任意终端里跑
+`powershell -ExecutionPolicy Bypass -File install\console.ps1`）：
+
+```
+[1] 打开 dsh   [2] 状态    [3] 体检    [4] 自动同步   [5] 更新 dsh
+[A] 权限清单   [R] 修复    [U] 卸载    [L] 同步日志   [F] 刷新
+[E] 语言 / language                                   [0] 退出
+```
+
+- 顶部是自检：Codespace 名字 / 状态、同步模式与开关、待提交文件数、上次推送时间
+- `[E]` 在中文 / English 之间切换，选择记在同目录的 `.console-lang`，下次打开保持
+- 每个动作都是调本目录里对应的脚本（`status.ps1` / `doctor.ps1` / `update.ps1` / `uninstall.ps1` …），
+  并把 `-Base` / `-Key` / `-Lang` 透传下去 —— 所以**这些脚本要和管理台放在同一个目录**，
+  直接在仓库的 `install\` 里用最省事
+- 常见参数：`-Action status` 直接执行某个动作（不给就进菜单）、`-Action preview` 只渲染一次菜单、
+  `-Lang en` 用英文界面、`-Base` / `-Key` 手动指定 gh 与私钥、`-CloudDir` 手动指定云端脚本目录
+  （默认按 Codespace 所属仓库名推出 `/workspaces/<repo>/.dsh-cloud`，推不出来会去容器里找一次）
 
 ## 本机一键（推荐）
 
@@ -89,6 +109,8 @@ bash ~/cloud-setup.sh              # 真正执行
 
 ## 发新版时
 
-1. 改 [`VERSION`](../VERSION) 和本目录两个脚本里的 `KIT_VERSION`
+1. 改 [`VERSION`](../VERSION) 和本目录所有脚本里的版本串：
+   `KIT_VERSION`（`*.sh`）/ `$KitVersion`（`*.ps1`）/ `console.ps1` 里的 `$Version`
+   —— `rg -n "1\.7\.1" install` 自查，别漏
 2. 在 [`CHANGELOG.md`](../CHANGELOG.md) 顶部加一节
-3. 打 tag：`git tag -a v1.0.1 -m "v1.0.1" && git push origin v1.0.1`
+3. 打 tag：`git tag -a vX.Y.Z -m "vX.Y.Z" && git push origin vX.Y.Z`

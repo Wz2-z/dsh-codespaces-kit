@@ -6,7 +6,7 @@ Run the official dsh inside a Codespace, keep your work in your own private repo
 machine through one SSH tunnel. Your computer only needs a portable GitHub CLI — no admin rights, no Node/Python,
 no credit card.
 
-Version [`v1.7.0`](CHANGELOG.md) · one-shot installer in [`install/`](install/) · the control panel speaks 中文 / English
+Version [`v1.7.1`](CHANGELOG.md) · one-shot installer in [`install/`](install/) · the control panel speaks 中文 / English
 
 | | |
 | --- | --- |
@@ -97,6 +97,25 @@ and ends with `✅ Installation complete`, plus launchers on your desktop.
 5. **From then on, just double-click**: the start launcher wakes the Codespace, starts dsh, opens the tunnel
    and your browser.
 
+The installer puts two shortcuts on your desktop (dsh logo):
+
+- **DeepSeek Harness** — start: wake the Codespace → start dsh → tunnel → browser
+- **Update dsh** — upgrade the cloud dsh to the latest release
+
+To keep the maintenance actions in one place, use the **Windows control panel** that ships with the kit:
+in your clone, double-click `install\console.bat` (same as
+`powershell -ExecutionPolicy Bypass -File install\console.ps1`):
+
+```
+[1] open dsh   [2] status     [3] checkup   [4] auto sync   [5] update dsh
+[A] credentials [R] repair    [U] uninstall [L] sync log    [F] refresh
+[E] language / 语言                                      [0] exit
+```
+
+The header shows Codespace state, sync mode, pending files and the last push; `[E]` flips the whole panel
+between 中文 and English. The panel calls `status.ps1` / `doctor.ps1` / `update.ps1` … from its own folder,
+so running it from the kit's `install\` is the simple path (a shortcut pointing there works too).
+
 ---
 
 ## Configuration
@@ -133,9 +152,11 @@ Install steps: [docs/en/plugins.md](docs/en/plugins.md).
 
 | I want to… | Do this |
 | --- | --- |
-| Start | Double-click the **DeepSeek Harness** (or **dsh control panel**) desktop shortcut |
-| See the current state | `dsh-codespaces status`, or menu item 2 in the control panel |
+| Start | Double-click the **DeepSeek Harness** shortcut, or control panel → 1 |
+| Open the control panel (Windows) | double-click `install\console.bat` in the kit — open / status / checkup / sync / update / credentials / repair / uninstall on one screen |
+| See the current state | `dsh-codespaces status`, or control panel → 2 |
 | Health check | `dsh-codespaces doctor` |
+| Update dsh | double-click the **Update dsh** shortcut, or control panel → 5 |
 | Commit right now | `bash .dsh-cloud/sync.sh --now` in the container, or control panel → 4 → 2 |
 | Save quota | <https://github.com/codespaces> → **Stop** |
 | See usage | <https://github.com/settings/billing> → Codespaces |
@@ -215,6 +236,8 @@ becomes `????` in `.bat` files · the workspace never syncs · dsh says *authent
 | --- | --- |
 | `README.md` / `README.en.md` | This guide (Chinese / English) |
 | `install/` | One-shot installer: `setup.ps1` / `setup.sh` / `cloud-setup.sh`, plus `doctor`, `status`, `audit`, `repair`, `update`, `uninstall` |
+| `install/dsh-codespaces.bat` / `.sh` | Single entry point for the commands above |
+| `install/console.ps1` / `console.bat` | Windows control panel (menu + header state, 中文 / English switch) |
 | `docs/en/` | English docs (this page links into it) |
 | `docs/` | Chinese docs |
 | `plugins/dsh-codespace-panel/` | dsh plugin: Codespaces quota panel |

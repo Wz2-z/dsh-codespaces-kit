@@ -50,7 +50,7 @@ Host 半边不碰 git 凭据、不碰 API Key，只在你机器上跑仓库里�
 - id: sync-panel
   name: 'dsh-sync-panel'
   config:
-    dir: /workspaces/dsh-box/.dsh-cloud   # 不写就自动在 /workspaces/*/.dsh-cloud 里找
+    dir: /workspaces/<repo>/.dsh-cloud   # 不写就自动在 /workspaces/*/.dsh-cloud 里找
     workspace: /home/codespace/dsh-workspace
     timeoutMs: 60000
     logLines: 8

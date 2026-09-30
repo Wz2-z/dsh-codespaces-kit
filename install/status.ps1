@@ -6,7 +6,7 @@
     powershell -ExecutionPolicy Bypass -File status.ps1 -Base <目录> -Key <私钥> -Quick   # 不查隧道，最快
 
   输出形如：
-    Codespace       Running (fluffy-…)
+    Codespace       Running (your-codespace…)
     Tunnel          Healthy (127.0.0.1:3080 → 401)
     DSH             0.1.7-rc.2 · pid 62857
     Auto sync       idle · on · daemon pid 54889

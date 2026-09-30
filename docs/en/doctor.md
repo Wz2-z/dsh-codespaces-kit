@@ -31,7 +31,7 @@ It merges **host-side** and **container-side** checks into one table and ends wi
 | Sync config | container | `sync.conf` has a valid mode | run `cloud-setup.sh` to (re)generate |
 | dsh web | container | port 3080 listening and requires a token (401) | `bash .dsh-cloud/start.sh`; see `~/dsh-web.log` |
 | Tunnel | host | `127.0.0.1:3080` answers | double-click the start launcher, or `gh codespace ports forward 3080:3080` |
-| Launcher | host | desktop shortcuts exist (and their targets exist) | re-run `install/setup.ps1` / `setup.sh` |
+| Launcher | host | a start entry (`DeepSeek Harness`) **and** a maintenance entry (`dsh 管理台` or `Update dsh`) exist, and the file each shortcut points at is still there | re-run `install/setup.ps1` / `setup.sh`; a shortcut whose target was moved reports `!` |
 
 ## Reading the three states
 
@@ -46,7 +46,9 @@ Exit code is 0 with no `✗`, 1 otherwise (handy in scripts/CI).
 | Flag | Effect |
 | --- | --- |
 | `-Base <dir>` (Windows) | where everything lives (expects `gh\bin\gh.exe` and `ghconfig\`) |
-| `-Gh <path>` / `-Key <path>` | point at a specific gh / private key |
+| `-Gh <path>` (Windows) | point at a specific portable gh |
+| `-Key <path>` / `--key <path>` | point at a specific SSH private key |
+| `-Lang zh\|en` (Windows, default `zh`) | output language; the panel passes its `[E]` choice through (`status` / `audit` take the same flag) |
 | `-NoTunnel` / `--no-tunnel` | skip the tunnel probe (faster) |
 | `-Json` / `--json` | machine-readable output |
 
