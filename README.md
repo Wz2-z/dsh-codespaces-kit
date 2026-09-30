@@ -235,14 +235,19 @@ dsh-codespaces uninstall   卸载 / 撤销（默认只预览，要 -Yes + 范围
 `status` 的输出长这样：
 
 ```
-Codespace       Running   your-codespace（Available）
-Tunnel          Healthy   127.0.0.1:3080 → 401（需要 token，正常）
-DSH             Healthy   0.1.7-rc.2 · pid 62857 · HTTP 401
-Auto sync       Running   idle · on · daemon pid 54889 · 静默 600s · 折叠 1800s
-Last check      32 seconds ago
-Last push       1 minute ago · dsh: add projects/plugincreate (6 files)
-Pending files   0
-In sync         yes（本地 19a6c79 / 远端 19a6c79）
+╭──────────────────────────────────────────────────────────────────╮
+│ dsh-codespaces status                                     v1.5.1 │
+│ codespace                     your-codespace-name-here-gxq9gv9gx │
+╰──────────────────────────────────────────────────────────────────╯
+
+│ Codespace   Running   your-codespace（Available）
+│ Tunnel      Healthy   127.0.0.1:3080 → 401（需要 token，正常）
+│ DSH         Healthy   0.1.7-rc.2 · pid 62857 · HTTP 401
+│ Auto sync   Running   idle · on · daemon pid 90277 · 静默 600s · 折叠 1800s
+│ Last check            32 秒前
+│ Last push             1 分钟前 · dsh: add projects/plugincreate (6 files)
+│ Pending files           0
+│ In sync               yes（本地 19a6c79 / 远端 19a6c79）
 ```
 
 - 生命周期细节：[docs/lifecycle.md](docs/lifecycle.md)
