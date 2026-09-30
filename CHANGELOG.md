@@ -3,6 +3,16 @@
 版本号规则：`MAJOR.MINOR.PATCH`（[语义化版本](https://semver.org/lang/zh-CN/)）。
 发新版时改三处：本文件、[`VERSION`](VERSION)、`install/setup.ps1` 与 `install/setup.sh` 里的 `KIT_VERSION`。
 
+## [1.5.1] - 2026-09-29
+
+界面统一成"框线 + 颜色"的一套观感（Windows 控制台里也正常，不需要 Windows Terminal）：
+
+- `status` 顶部加了框线标题（版本 + Codespace），下面每行左边一条竖线，
+  状态列按**显示宽度**对齐（中文算两格，不再错位）；时间改成本地化的"39 分钟前"
+- 本机的管理台改成用 PowerShell 画界面（`dsh-console.ps1`），菜单项同样按显示宽度对齐，
+  `.bat` 只留一行启动器 —— 也顺手避开了 `.bat` 里 CRLF / `chcp` 那两个坑
+- `status` / `doctor` / `audit` 三份输出的状态色统一：绿=好、黄=要留意、红=坏了
+
 ## [1.5.0] - 2026-09-29
 
 补齐生命周期 + 安全清单 + 统一可观测性。

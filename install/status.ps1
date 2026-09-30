@@ -27,7 +27,7 @@ param(
     [switch]$Json
 )
 $ErrorActionPreference = 'Continue'
-$KitVersion = '1.5.0'
+$KitVersion = '1.5.1'
 $CloudStatusUrl = 'https://raw.githubusercontent.com/Wz2-z/dsh-codespaces-kit/main/install/cloud-status.sh'
 try { [Console]::OutputEncoding = [Text.Encoding]::UTF8 } catch {}
 try { $OutputEncoding = [Text.Encoding]::UTF8 } catch {}
@@ -61,10 +61,10 @@ function Format-Age($epoch) {
     if (-not [double]::TryParse("$epoch", [ref]$value) -or $value -le 0) { return '—' }
     $seconds = [int]([DateTimeOffset]::UtcNow.ToUnixTimeSeconds() - $value)
     if ($seconds -lt 0) { return '刚刚' }
-    if ($seconds -lt 60) { return "$seconds seconds ago" }
-    if ($seconds -lt 3600) { return "$([int]($seconds / 60)) minute(s) ago" }
-    if ($seconds -lt 86400) { return "$([int]($seconds / 3600)) hour(s) ago" }
-    return "$([int]($seconds / 86400)) day(s) ago"
+    if ($seconds -lt 60) { return "$seconds 秒前" }
+    if ($seconds -lt 3600) { return "$([int]($seconds / 60)) 分钟前" }
+    if ($seconds -lt 86400) { return "$([int]($seconds / 3600)) 小时前" }
+    return "$([int]($seconds / 86400)) 天前"
 }
 
 # ---------------------------------------------------------------- 找 Codespace
@@ -157,14 +157,52 @@ if ($Json) {
 }
 
 Write-Host ''
-Write-Host "dsh-codespaces status  v$KitVersion" -ForegroundColor White
-$rowColor = { param($state) switch ($state) { 'Healthy' { 'Green' } 'Running' { 'Green' } 'Down' { 'Red' } 'Stopped' { 'Red' } default { 'Yellow' } } }
+$W = 68
+function Get-VisualLength([string]$s) {
+    $n = 0
+    foreach ($ch in $s.ToCharArray()) {
+        $code = [int][char]$ch
+        if ($code -ge 0x1100 -and ($code -le 0x115F -or ($code -ge 0x2E80 -and $code -le 0xA4CF) -or
+            ($code -ge 0xAC00 -and $code -le 0xD7A3) -or ($code -ge 0xF900 -and $code -le 0xFAFF) -or
+            ($code -ge 0xFE30 -and $code -le 0xFE6F) -or ($code -ge 0xFF00 -and $code -le 0xFF60) -or
+            ($code -ge 0xFFE0 -and $code -le 0xFFE6))) { $n += 2 } else { $n += 1 }
+    }
+    return $n
+}
+function Rule([string]$left = '', [string]$right = '') {
+    $pad = $W - 4 - (Get-VisualLength $left) - (Get-VisualLength $right)
+    if ($pad -lt 1) { $pad = 1 }
+    Write-Host '│ ' -NoNewline -ForegroundColor DarkCyan
+    Write-Host $left -NoNewline -ForegroundColor DarkGray
+    Write-Host (' ' * $pad) -NoNewline
+    Write-Host $right -NoNewline -ForegroundColor DarkGray
+    Write-Host ' │' -ForegroundColor DarkCyan
+}
 function Row([string]$name, [string]$state, [string]$detail) {
     $color = switch ($state) { 'Healthy' { 'Green' } 'Running' { 'Green' } 'Down' { 'Red' } 'Stopped' { 'Red' } default { 'Yellow' } }
-    Write-Host ("  {0,-16}" -f $name) -NoNewline
-    Write-Host ("{0,-10}" -f $state) -ForegroundColor $color -NoNewline
+    $pad = 12 - (Get-VisualLength $name)
+    if ($pad -lt 1) { $pad = 1 }
+    Write-Host '│ ' -NoNewline -ForegroundColor DarkCyan
+    Write-Host $name -NoNewline -ForegroundColor White
+    Write-Host (' ' * $pad) -NoNewline
+    if ($state) {
+        $spad = 10 - (Get-VisualLength $state)
+        if ($spad -lt 1) { $spad = 1 }
+        Write-Host $state -ForegroundColor $color -NoNewline
+        Write-Host (' ' * $spad) -NoNewline
+    } else {
+        Write-Host (' ' * 10) -NoNewline
+    }
+    # 详情长度不定，右边框会飘；只留左边一条竖线，反而更整齐
     Write-Host $detail -ForegroundColor DarkGray
 }
+
+Write-Host ''
+Write-Host ('╭' + ('─' * ($W - 2)) + '╮') -ForegroundColor DarkCyan
+Rule "dsh-codespaces status" "v$KitVersion"
+Rule 'codespace' $(if ($Codespace) { $Codespace } else { '（没有）' })
+Write-Host ('╰' + ('─' * ($W - 2)) + '╯') -ForegroundColor DarkCyan
+Write-Host ''
 
 if ($Codespace) { Row 'Codespace' $(if ($state -and $state -ne 'Available') { 'Starting' } else { 'Running' }) "$Codespace$(if ($state) { "（$state）" })" }
 else { Row 'Codespace' 'Down' '没有可用的 Codespace' }

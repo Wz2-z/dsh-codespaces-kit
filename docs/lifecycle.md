@@ -30,16 +30,20 @@ Windows 用 `install\dsh-codespaces.bat <命令>`，macOS/Linux 用 `install/dsh
 ## `status` 长什么样
 
 ```
-dsh-codespaces status  v1.5.0
-  Codespace       Running   fluffy-…（Available）
-  Tunnel          Healthy   127.0.0.1:3080 → 401（需要 token，正常）
-  DSH             Healthy   0.1.7-rc.2 · pid 62857 · HTTP 401
-  Auto sync       Running   idle · on · daemon pid 54889 · 静默 600s · 折叠 1800s
-  Last check      32 seconds ago
-  Last push       1 minute ago · dsh: add projects/plugincreate (6 files)
-  Last commit     19a6c79 · 12 minutes ago · dsh: add projects/plugincreate (6 files)
-  Pending files   0
-  In sync         yes（本地 19a6c79 / 远端 19a6c79）
+╭──────────────────────────────────────────────────────────────────╮
+│ dsh-codespaces status                                     v1.5.1 │
+│ codespace                     fluffy-space-meme-gxq9gv9gx4g63gvj │
+╰──────────────────────────────────────────────────────────────────╯
+
+│ Codespace   Running   fluffy-…（Available）
+│ Tunnel      Healthy   127.0.0.1:3080 → 401（需要 token，正常）
+│ DSH         Healthy   0.1.7-rc.2 · pid 62857 · HTTP 401
+│ Auto sync   Running   idle · on · daemon pid 90277 · 静默 600s · 折叠 1800s
+│ Last check            32 秒前
+│ Last push             1 分钟前 · dsh: add projects/plugincreate (6 files)
+│ Last commit           19a6c79 · 12 分钟前 · dsh: add projects/plugincreate (6 files)
+│ Pending files           0
+│ In sync               yes（本地 19a6c79 / 远端 19a6c79）
 ```
 
 几个状态词的意思：
