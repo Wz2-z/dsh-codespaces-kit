@@ -7,6 +7,9 @@
 dsh 的插件跑在**宿主进程**里，权限等于你的云端账号。所以原则是：
 **来源清楚、能看懂在干什么的才装；不确定的先在 `read-only` 权限下试跑。**
 
+下面是本仓库自带的两个插件。**界面都跟 dsh 的语言走**（中文 / English 各一套文案，在
+`client.js` 里；插件列表的标题与说明在各自的 `locale/zh.json`、`locale/en.json`），不需要额外开关。
+
 ## dsh-codespace-panel（在侧边栏看额度 + 一键停止）
 
 完整说明见 [`plugins/dsh-codespace-panel/`](https://github.com/Wz2-z/dsh-codespaces-kit/tree/main/plugins/dsh-codespace-panel)（含截图、路由、设计约束）。

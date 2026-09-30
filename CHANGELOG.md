@@ -4,6 +4,19 @@
 发新版时改三处：本文件、[`VERSION`](VERSION)、`install/` 下所有脚本里的版本串
 （`KIT_VERSION` / `$KitVersion` / `console.ps1` 的 `$Version`）。
 
+## [未发布] - 2026-09-30
+
+插件界面补齐中英双语（`dsh-codespace-panel` 之前就有，这次是 `dsh-sync-panel` + 两个插件的英文文档）。
+
+- **`dsh-sync-panel` 的 client 半边接上 dsh 的 `ctx.locale`**：`zh` / `en` 两张表（32 个键一一对应），
+  界面语言跟着 dsh 走，没有额外开关；Host 半边只回错误码（`no-sync-script` / `bad-mode` / `bad-action` …），
+  措辞在客户端挑，唯一例外是 `command-failed`（它带的是 `sync.sh` 自己的输出，原样显示）
+- `package.json`：加 `locale/*.json` 的导出与打包、`dsh.client.inject` 里加
+  `@deepseek-ai/dsh-client-locale`，插件版本 `1.0.0` → **`1.1.0`**；插件列表里的标题与说明来自
+  `locale/zh.json` 与 `locale/en.json`（`dsh-codespace-panel` 的 README 也补了「语言」一节）
+- **英文文档**：两个插件各补一份 `README.en.md`（此前只有中文），中文那份顶部加了 `English` 链接；
+  `docs/plugins.md` / `docs/en/plugins.md` 说明两个面板都跟随 dsh 的语言
+
 ## [1.7.2] - 2026-09-30
 
 管理台进安装器 + 文档追上 v1.7.0 / v1.7.1 已经上线的功能。

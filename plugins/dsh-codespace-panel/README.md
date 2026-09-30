@@ -1,6 +1,6 @@
 # dsh-codespace-panel
 
-作者：[@Wz2-z](https://github.com/Wz2-z) · 许可：MIT
+作者：[@Wz2-z](https://github.com/Wz2-z) · 许可：MIT · [English](README.en.md)
 
 在 DSH Web 界面里看 **GitHub Codespaces 额度**、**当前 Codespace 的状态与硬件占用（内存 / CPU / 磁盘）**，并直接**启动 / 停止 / 重启**它。一个 bundle、一行 Host 插件、七个 EXACT 路由。
 
@@ -8,6 +8,15 @@
 - **弹出面板**：注册在框架级浮层 `shell.overlay`，不会被任何一栏裁剪。
 - **Codespace 卡片**（上半）：状态点 + 状态文字 → 机器/存储规格 → 内存 / CPU / 磁盘三条实时占用条（按用量变色）+ 最近约 4 分钟的双线趋势图 → `启动 / 停止 / 重启 / 重建` 四宫格 → 页脚一行「刷新时间 · 进程数 · 运行时长」和 Git 状态（干净 / 有未提交 / 有未推送 + 分支）。
 - **额度卡片**（下半）：套餐、本月计算额度（核心·小时）、存储额度（GB·月）、进度条、剩余量、重置日期、原始用量明细。
+
+## 语言
+
+面板跟 **dsh 的语言**走（`ctx.locale.register`）：中文界面与 English 界面都在 `client.js` 里
+（`zh` / `en` 两张表），插件列表里的标题与说明来自 `locale/zh.json` 与 `locale/en.json`，
+不需要额外开关。
+
+Host 半边回的是错误码（`err_forbidden` / `err_auth` / `err_not_found` …），所有可见措辞都在客户端挑，
+这样切语言时连报错文案也跟着换。
 
 ## 控制按钮的真实能力
 

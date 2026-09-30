@@ -5,6 +5,10 @@
 dsh plugins run **inside the host process**, with the same permissions as your container account. So the rule is:
 install only what you can read and understand; try anything uncertain under `read-only` first.
 
+The two plugins below ship with this repo. **Both follow dsh's language** (a Chinese and an English dictionary
+inside `client.js`; the title and description in the plugin list come from each plugin's `locale/zh.json` and
+`locale/en.json`) — there is no separate switch.
+
 ## dsh-codespace-panel (quota + one-click stop)
 
 Full description: [`plugins/dsh-codespace-panel/`](https://github.com/Wz2-z/dsh-codespaces-kit/tree/main/plugins/dsh-codespace-panel).

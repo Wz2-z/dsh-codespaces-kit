@@ -7,6 +7,9 @@
  *
  * 所有数据都来自 Host 半边的 /sync-panel/*，这一半不碰 git、不碰凭据。
  * 按钮保持恒定尺寸：footer 是和别的插件共用的座位，忽大忽小会带动别人的控件。
+ *
+ * 文案走 dsh 的 locale 服务（和 dsh-codespace-panel 同一套）：界面语言跟着 dsh 走，
+ * 中文 / English 都有；Host 半边只回错误码（比如 no-sync-script），具体措辞在这里挑。
  */
 window.__ModuleLoader__.load({
   id: 'dsh-sync-panel',
@@ -18,6 +21,78 @@ window.__ModuleLoader__.load({
     const ROUTE = '/sync-panel'
     const FENCE = { 'x-sync-panel': '1' }
     const AUTO_REFRESH_MS = 60 * 1000
+
+    /* ---------------------------------------------------------------- 文案 */
+
+    const zh = {
+      trigger: '自动同步',
+      title: '自动同步',
+      refresh: '刷新',
+      done: '完成',
+      modeBadge: '模式 {mode}',
+      paused: '已暂停',
+      running: '同步中',
+      daemonOn: '守护进程在跑',
+      daemonOff: '守护进程没在跑',
+      pending: '待提交',
+      pendingFiles: '{count} 个文件',
+      lastCommit: '最近提交',
+      foldWindow: '折叠窗口',
+      seconds: '{seconds} 秒',
+      off: '关闭',
+      idleThreshold: '静默阈值',
+      none: '—',
+      commitNow: '立即提交',
+      pause: '暂停',
+      resume: '恢复',
+      fold30: '折进 30 分钟',
+      foldOff: '关闭折叠',
+      err_forbidden: '请求被拒绝（缺少插件请求头，或来自跨站页面）',
+      err_method: '请求方法不对',
+      err_no_sync_script: '没找到 .dsh-cloud/sync.sh（可以用配置项 dir 指定它的目录）',
+      err_bad_mode: '模式只能是 idle / interval / manual',
+      err_bad_action: '未知操作',
+      err_too_large: '请求体过大',
+      err_bad_json: '请求体不是合法 JSON',
+      err_http: 'Host 返回了错误状态',
+      err_no_json: 'Host 返回的不是 JSON（HTTP {status}）',
+      err_unknown: '未知错误',
+    }
+
+    const en = {
+      trigger: 'Auto sync',
+      title: 'Auto sync',
+      refresh: 'Refresh',
+      done: 'done',
+      modeBadge: 'mode {mode}',
+      paused: 'paused',
+      running: 'running',
+      daemonOn: 'daemon running',
+      daemonOff: 'daemon not running',
+      pending: 'Pending',
+      pendingFiles: '{count} files',
+      lastCommit: 'Last commit',
+      foldWindow: 'Fold window',
+      seconds: '{seconds}s',
+      off: 'off',
+      idleThreshold: 'Idle threshold',
+      none: '—',
+      commitNow: 'Commit now',
+      pause: 'Pause',
+      resume: 'Resume',
+      fold30: 'Fold 30 min',
+      foldOff: 'Fold off',
+      err_forbidden: 'request refused (missing plugin header, or a cross-site caller)',
+      err_method: 'wrong HTTP method',
+      err_no_sync_script: 'could not find .dsh-cloud/sync.sh (set the dir option if it lives elsewhere)',
+      err_bad_mode: 'mode must be idle / interval / manual',
+      err_bad_action: 'unknown action',
+      err_too_large: 'request body is too large',
+      err_bad_json: 'request body is not valid JSON',
+      err_http: 'the Host answered with an error status',
+      err_no_json: 'the Host did not answer with JSON (HTTP {status})',
+      err_unknown: 'unknown error',
+    }
 
     /* ------------------------------------------------------------ 极简 store */
 
@@ -44,7 +119,58 @@ window.__ModuleLoader__.load({
     }
 
     const uiStore = createStore({ open: false })
-    const dataStore = createStore({ status: 'idle', value: null, error: null, busy: '', toast: '', at: 0 })
+    const dataStore = createStore({ status: 'idle', value: null, error: null, busy: '', toast: '', toastKey: '', at: 0 })
+
+    /* -------------------------------------------------------------- 翻译 */
+
+    function useSubscribed(subscribe, read) {
+      const [value, setValue] = React.useState(read)
+      React.useEffect(() => subscribe(() => setValue(read())), [subscribe, read])
+      return value
+    }
+
+    function useTranslate(ctx) {
+      const locale = ctx.locale
+      const subscribe = React.useCallback(
+        (listener) => {
+          try {
+            return locale.subscribe(listener)
+          } catch {
+            return () => {}
+          }
+        },
+        [locale],
+      )
+      const read = React.useCallback(() => {
+        try {
+          return String(locale.getSnapshot()?.active ?? 'en')
+        } catch {
+          return 'en'
+        }
+      }, [locale])
+      const active = useSubscribed(subscribe, read)
+      const lang = active.toLowerCase().startsWith('zh') ? 'zh' : 'en'
+      return React.useCallback(
+        (key, params) => {
+          const dict = lang === 'zh' ? zh : en
+          const template = dict[key] ?? en[key] ?? key
+          if (params === undefined) return template
+          return template.replace(/\{(\w+)\}/g, (match, name) =>
+            params[name] === undefined ? match : String(params[name]),
+          )
+        },
+        [lang],
+      )
+    }
+
+    // Host 回的是错误码（command-failed 那条带着 sync.sh 自己的输出，字典里故意不收，
+    // 这样它会原样透出来，比一句笼统的"失败了"有用）
+    function errorText(t, error, fallbackKey) {
+      const code = typeof error?.code === 'string' ? error.code : ''
+      const key = `err_${code.replace(/-/g, '_')}`
+      if (code !== '' && t(key) !== key) return t(key, { status: error?.detail?.status ?? '?' })
+      return error?.message ?? (fallbackKey === undefined ? '' : t(fallbackKey))
+    }
 
     /* ------------------------------------------------------------------ 样式 */
 
@@ -109,9 +235,17 @@ window.__ModuleLoader__.load({
       try {
         json = JSON.parse(text)
       } catch {
-        throw new Error(`返回的不是 JSON（HTTP ${response.status}）`)
+        throw Object.assign(new Error(`HTTP ${response.status}`), {
+          code: 'no-json',
+          detail: { status: response.status },
+        })
       }
-      if (json?.ok !== true) throw new Error(json?.error?.message ?? `HTTP ${response.status}`)
+      if (json?.ok !== true) {
+        throw Object.assign(new Error(json?.error?.message ?? `HTTP ${response.status}`), {
+          code: typeof json?.error?.code === 'string' ? json.error.code : 'http',
+          detail: { status: response.status },
+        })
+      }
       return json.data
     }
 
@@ -121,24 +255,27 @@ window.__ModuleLoader__.load({
         const data = await call('/summary')
         dataStore.set({ status: 'ready', value: data, error: null, at: Date.now() })
       } catch (error) {
-        dataStore.set({ status: 'error', error: String(error?.message ?? error) })
+        dataStore.set({ status: 'error', error })
       }
     }
 
     async function act(payload) {
-      dataStore.set({ busy: payload.action, toast: '' })
+      dataStore.set({ busy: payload.action, toast: '', toastKey: '' })
       try {
         const data = await call('/action', { method: 'POST', body: JSON.stringify(payload) })
+        const output = (data.output || '').split('\n').slice(-2).join(' / ')
         dataStore.set({
           busy: '',
           status: 'ready',
           value: data.summary ?? dataStore.get().value,
-          toast: (data.output || '完成').split('\n').slice(-2).join(' / '),
+          toast: output,
+          toastKey: output ? '' : 'done',
+          error: null,
         })
       } catch (error) {
-        dataStore.set({ busy: '', error: String(error?.message ?? error), toast: '' })
+        dataStore.set({ busy: '', error, toast: '', toastKey: '' })
       }
-      setTimeout(() => dataStore.set({ toast: '' }), 4000)
+      setTimeout(() => dataStore.set({ toast: '', toastKey: '' }), 4000)
     }
 
     /* --------------------------------------------------------------- 组件 */
@@ -164,7 +301,8 @@ window.__ModuleLoader__.load({
       )
     }
 
-    function Trigger() {
+    function Trigger(props) {
+      const t = props.t
       const ui = useStore(uiStore)
       const snapshot = useStore(dataStore)
       const value = snapshot.value
@@ -174,8 +312,8 @@ window.__ModuleLoader__.load({
         {
           type: 'button',
           className: 'dsp-trigger',
-          title: '自动同步',
-          'aria-label': '自动同步',
+          title: t('trigger'),
+          'aria-label': t('trigger'),
           'aria-expanded': ui.open ? 'true' : 'false',
           'data-on': on === false ? 'false' : 'true',
           'data-busy': snapshot.status === 'loading' || snapshot.busy !== '' ? 'true' : 'false',
@@ -198,7 +336,8 @@ window.__ModuleLoader__.load({
       return h('div', { className: 'dsp-row' }, h('span', { className: 'dsp-k' }, key), h('span', { className: 'dsp-v' }, value))
     }
 
-    function PanelView() {
+    function PanelView(props) {
+      const t = props.t
       const ui = useStore(uiStore)
       const snapshot = useStore(dataStore)
 
@@ -227,9 +366,9 @@ window.__ModuleLoader__.load({
       const pendingList = value?.pendingFiles ?? []
 
       const buttons = [
-        ['now', '立即提交', true],
-        ['pause', '暂停', false],
-        ['resume', '恢复', false],
+        ['now', t('commitNow'), true],
+        ['pause', t('pause'), false],
+        ['resume', t('resume'), false],
       ].map(([action, label, primary]) =>
         h(
           'button',
@@ -261,8 +400,8 @@ window.__ModuleLoader__.load({
       )
 
       const squash = [
-        [1800, '折进 30 分钟'],
-        [0, '关闭折叠'],
+        [1800, t('fold30')],
+        [0, t('foldOff')],
       ].map(([seconds, label]) =>
         h(
           'button',
@@ -286,28 +425,28 @@ window.__ModuleLoader__.load({
           h(
             'div',
             { className: 'dsp-head' },
-            h('span', { className: 'dsp-title' }, '自动同步'),
+            h('span', { className: 'dsp-title' }, t('title')),
             h(
               'button',
               { type: 'button', className: 'dsp-btn', onClick: () => refresh(), disabled },
-              '刷新',
+              t('refresh'),
             ),
           ),
-          snapshot.error ? h('div', { className: 'dsp-err' }, String(snapshot.error)) : null,
+          snapshot.error ? h('div', { className: 'dsp-err' }, errorText(t, snapshot.error, 'err_unknown')) : null,
           h(
             'div',
             { className: 'dsp-badges' },
-            Badge(`模式 ${conf.mode ?? '—'}`, true),
-            Badge(conf.enabled === 'off' ? '已暂停' : '同步中', conf.enabled !== 'off'),
-            Badge(value?.daemon ? '守护进程在跑' : '守护进程没在跑', Boolean(value?.daemon)),
+            Badge(t('modeBadge', { mode: conf.mode ?? t('none') }), true),
+            Badge(conf.enabled === 'off' ? t('paused') : t('running'), conf.enabled !== 'off'),
+            Badge(value?.daemon ? t('daemonOn') : t('daemonOff'), Boolean(value?.daemon)),
           ),
-          Row('待提交', value ? `${value.pendingCount} 个文件` : '…'),
+          Row(t('pending'), value ? t('pendingFiles', { count: value.pendingCount }) : '…'),
           pendingList.length
             ? h('div', { className: 'dsp-mono' }, pendingList.join('\n'))
             : null,
-          Row('最近提交', h('span', { className: 'dsp-mono' }, value?.lastCommit ?? '…')),
-          Row('折叠窗口', conf.squash_window_seconds ? `${conf.squash_window_seconds} 秒` : '关闭'),
-          Row('静默阈值', conf.idle_seconds ? `${conf.idle_seconds} 秒` : '—'),
+          Row(t('lastCommit'), h('span', { className: 'dsp-mono' }, value?.lastCommit ?? '…')),
+          Row(t('foldWindow'), conf.squash_window_seconds ? t('seconds', { seconds: conf.squash_window_seconds }) : t('off')),
+          Row(t('idleThreshold'), conf.idle_seconds ? t('seconds', { seconds: conf.idle_seconds }) : t('none')),
           h('div', { className: 'dsp-actions' }, buttons),
           h('div', { className: 'dsp-actions' }, modes),
           h('div', { className: 'dsp-actions' }, squash),
@@ -318,7 +457,9 @@ window.__ModuleLoader__.load({
                 value.log.slice(-6).join('\n'),
               )
             : null,
-          snapshot.toast ? h('div', { className: 'dsp-toast' }, snapshot.toast) : null,
+          snapshot.toast || snapshot.toastKey
+            ? h('div', { className: 'dsp-toast' }, snapshot.toast || t(snapshot.toastKey))
+            : null,
         ),
       )
     }
@@ -326,14 +467,22 @@ window.__ModuleLoader__.load({
     /* ---------------------------------------------------------------- plugin */
 
     return {
-      inject: ['slots'],
+      inject: ['slots', 'locale'],
       apply(ctx) {
+        ctx.effect(() => ctx.locale.register(NS, { zh, en }), 'dsh-sync-panel: dictionaries')
         ctx.effect(() => installStyle(), 'dsh-sync-panel: styles')
+
+        const withTranslate = (Component) =>
+          function Bound() {
+            const t = useTranslate(ctx)
+            return h(Component, { t })
+          }
+
         ctx.slots.inject('sidebar.footer.action', () =>
-          ctx.slots.register({ name: 'sidebar.footer.action', id: NS, order: 5 }, Trigger),
+          ctx.slots.register({ name: 'sidebar.footer.action', id: NS, order: 5 }, withTranslate(Trigger)),
         )
         ctx.slots.inject('shell.overlay', () =>
-          ctx.slots.register({ name: 'shell.overlay', id: `${NS}-panel`, order: 21 }, PanelView),
+          ctx.slots.register({ name: 'shell.overlay', id: `${NS}-panel`, order: 21 }, withTranslate(PanelView)),
         )
       },
     }

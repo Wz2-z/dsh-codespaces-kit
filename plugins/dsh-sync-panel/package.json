@@ -1,6 +1,6 @@
 {
   "name": "dsh-sync-panel",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "type": "module",
   "description": "自动同步面板：显示同步模式、待提交文件、最近一次同步与日志，并能暂停/恢复/立即提交/切换模式。",
@@ -12,13 +12,15 @@
   "exports": {
     ".": "./index.js",
     "./client": "./client.js",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./locale/*.json": "./locale/*.json"
   },
   "files": [
     "index.js",
     "client.js",
     "cordis.patch.yml",
-    "icon.svg"
+    "icon.svg",
+    "locale/*.json"
   ],
   "dsh": {
     "bundle": {
@@ -26,7 +28,10 @@
     },
     "client": {
       "platform": "web",
-      "immediately": true
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-locale"
+      ]
     }
   },
   "author": "Wz2-z (https://github.com/Wz2-z)"

@@ -1,6 +1,6 @@
 # dsh-sync-panel
 
-作者：[@Wz2-z](https://github.com/Wz2-z) · 许可：MIT
+作者：[@Wz2-z](https://github.com/Wz2-z) · 许可：MIT · [English](README.en.md)
 
 在 dsh 侧边栏底部放一个**同步按钮**：点开就能看到自动同步的状态，并且能直接操作它 ——
 不用再跑到容器终端里敲 `sync.sh --status`。
@@ -13,6 +13,15 @@
 - **折叠窗口 / 静默阈值**：当前生效的秒数
 - **最近日志**：`~/dsh-sync.log` 的最后几行（`pushed` / `folded` / `skipped` / `FAILED`）
 - **按钮**：立即提交、暂停、恢复、切换模式（idle / interval / manual）、折叠窗口开/关
+
+## 语言
+
+界面跟 **dsh 的语言**走（`ctx.locale`）：dsh 说中文就是中文，说 English 就是 English，不用另设开关。
+两套文案都在 `client.js` 里（`zh` / `en` 两张表，键一一对应），插件列表里的标题与说明来自
+`locale/zh.json` 与 `locale/en.json`。
+
+Host 半边只回错误码（`no-sync-script` / `bad-mode` / `bad-action` …），具体措辞由客户端挑；
+唯一例外是 `command-failed` —— 它带的是 `sync.sh` 自己的输出，会原样显示（那部分文案在云端脚本里）。
 
 ## 装法
 

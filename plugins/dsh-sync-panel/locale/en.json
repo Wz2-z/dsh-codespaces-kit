@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Auto Sync Panel",
+    "description": "A sync button at the sidebar foot: auto-sync mode, pending files, the last commit and the log, with pause / resume / commit-now / mode switches."
+  }
+}
