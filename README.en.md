@@ -6,6 +6,8 @@ Run the official dsh inside a Codespace, keep your work in your own private repo
 machine through one SSH tunnel. Your computer only needs a portable GitHub CLI — no admin rights, no Node/Python,
 no credit card.
 
+Version [`v1.7.0`](CHANGELOG.md) · one-shot installer in [`install/`](install/) · the control panel speaks 中文 / English
+
 | | |
 | --- | --- |
 | **Who it's for** | People who want the official dsh without running an agent locally, without a cloud VM, and with a fully isolated environment |

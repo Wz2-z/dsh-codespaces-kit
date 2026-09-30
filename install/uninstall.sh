@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # dsh-codespaces uninstall（macOS / Linux 本机）—— 默认只预览，--yes 才动手
 set -u
-KIT_VERSION="1.6.0"
+KIT_VERSION="1.7.0"
 CLOUD_UNINSTALL_URL="https://raw.githubusercontent.com/Wz2-z/dsh-codespaces-kit/main/install/cloud-uninstall.sh"
 YES=0; LOCAL=0; PURGE_LOCAL=0; CLOUD=0; PURGE_CLOUD=0; REVOKE=0; DELETE_CS=0
 KEY="$HOME/.ssh/dsh_cs_key"; CS=""

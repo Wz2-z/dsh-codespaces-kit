@@ -3,6 +3,21 @@
 版本号规则：`MAJOR.MINOR.PATCH`（[语义化版本](https://semver.org/lang/zh-CN/)）。
 发新版时改三处：本文件、[`VERSION`](VERSION)、`install/setup.ps1` 与 `install/setup.sh` 里的 `KIT_VERSION`。
 
+## [1.7.0] - 2026-09-29
+
+控制台双语 + 版本号修正。
+
+- **管理台支持中文 / English 切换**：菜单里多了一项 `[E] 语言 / language`，
+  选完立即换界面并记住选择（存在同目录的 `.console-lang`）；
+  面板顶部、菜单、子菜单、确认提示都会跟着切换
+- `status` / `doctor` / `audit` 都新增 `-Lang zh|en`（默认 `zh`），控制台会把选择透传下去：
+  `status` 的标签、状态词、时间（"32 秒前" / "32 seconds ago"）都会跟着变；
+  `audit` 连云端那份清单也会切成英文（`cloud-audit.sh --lang=en`）
+- 控制台本身做成 kit 的一部分：`install/console.ps1` + `install/console.bat`，
+  自动找 `%LOCALAPPDATA%\dsh-cloud` 或仓库旁的 `<base>\gh\bin\gh.exe`，别人装完也能直接用同款面板
+- 修正中文 README 顶部一直没更新的版本号（还写着 v1.0.0，改成 v1.7.0），
+  文档里的 `status` 示例版本号也一并更新
+
 ## [1.6.0] - 2026-09-29
 
 英文版 + 文档站（GitHub Pages）。

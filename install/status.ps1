@@ -22,15 +22,56 @@ param(
     [string]$Base,
     [string]$Gh,
     [string]$GhConfig,
+    [ValidateSet('zh', 'en')][string]$Lang = 'zh',
     [switch]$NoTunnel,
     [switch]$Quick,
     [switch]$Json
 )
 $ErrorActionPreference = 'Continue'
-$KitVersion = '1.6.0'
+$KitVersion = '1.7.0'
 $CloudStatusUrl = 'https://raw.githubusercontent.com/Wz2-z/dsh-codespaces-kit/main/install/cloud-status.sh'
 try { [Console]::OutputEncoding = [Text.Encoding]::UTF8 } catch {}
 try { $OutputEncoding = [Text.Encoding]::UTF8 } catch {}
+
+$T = if ($Lang -eq 'en') {
+    @{
+        codespace = 'codespace'; noCodespace = 'no Codespace available'
+        lCodespace = 'Codespace'; lTunnel = 'Tunnel'; lDsh = 'DSH'; lSync = 'Auto sync'
+        lCheck = 'Last check'; lPush = 'Last push'; lCommit = 'Last commit'
+        lPending = 'Pending files'; lInSync = 'In sync'
+        sRunning = 'Running'; sStarting = 'Starting'; sHealthy = 'Healthy'; sDown = 'Down'
+        sDegraded = 'Degraded'; sSkipped = 'Skipped'; sStopped = 'Stopped'; sPaused = 'Paused'
+        d401 = '127.0.0.1:3080 → 401 (token required = good)'
+        d200 = '127.0.0.1:3080 → 200'
+        dNoTunnel = '127.0.0.1:3080 unreachable'; dCode = 'returned {0}'
+        dSkipFlag = 'skipped (-Quick/-NoTunnel)'; dSkipMissing = 'skipped (no gh / key / Codespace)'
+        daemon = 'daemon pid'; idle = 'idle'; fold = 'fold'; paused = 'paused'; on = 'on'
+        fresh = 'just now'; seconds = '{0} seconds ago'; minutes = '{0} minutes ago'
+        hours = '{0} hours ago'; days = '{0} days ago'; dash = '—'
+        local = 'local'; remote = 'remote'
+        paren = @{ o = '('; c = ')' }
+        failures = 'log has {0} push FAILED entries (tail -n 40 ~/dsh-sync.log)'
+    }
+} else {
+    @{
+        codespace = 'codespace'; noCodespace = '没有可用的 Codespace'
+        lCodespace = 'Codespace'; lTunnel = 'Tunnel'; lDsh = 'DSH'; lSync = 'Auto sync'
+        lCheck = 'Last check'; lPush = 'Last push'; lCommit = 'Last commit'
+        lPending = 'Pending files'; lInSync = 'In sync'
+        sRunning = 'Running'; sStarting = 'Starting'; sHealthy = 'Healthy'; sDown = 'Down'
+        sDegraded = 'Degraded'; sSkipped = 'Skipped'; sStopped = 'Stopped'; sPaused = '已暂停'
+        d401 = '127.0.0.1:3080 → 401（需要 token，正常）'
+        d200 = '127.0.0.1:3080 → 200'
+        dNoTunnel = '127.0.0.1:3080 没通'; dCode = '返回 {0}'
+        dSkipFlag = '按 -Quick/-NoTunnel 跳过'; dSkipMissing = '跳过（缺 gh / 密钥 / Codespace）'
+        daemon = 'daemon pid'; idle = '静默'; fold = '折叠'; paused = '已暂停'; on = 'on'
+        fresh = '刚刚'; seconds = '{0} 秒前'; minutes = '{0} 分钟前'
+        hours = '{0} 小时前'; days = '{0} 天前'; dash = '—'
+        local = '本地'; remote = '远端'
+        paren = @{ o = '（'; c = '）' }
+        failures = '日志里有 {0} 次 push FAILED（tail -n 40 ~/dsh-sync.log 看看）'
+    }
+}
 
 function Test-Exists([string]$path) {
     try { return [bool](Test-Path -LiteralPath $path -ErrorAction Stop) } catch { return $false }
@@ -60,11 +101,11 @@ function Format-Age($epoch) {
     $value = 0
     if (-not [double]::TryParse("$epoch", [ref]$value) -or $value -le 0) { return '—' }
     $seconds = [int]([DateTimeOffset]::UtcNow.ToUnixTimeSeconds() - $value)
-    if ($seconds -lt 0) { return '刚刚' }
-    if ($seconds -lt 60) { return "$seconds 秒前" }
-    if ($seconds -lt 3600) { return "$([int]($seconds / 60)) 分钟前" }
-    if ($seconds -lt 86400) { return "$([int]($seconds / 3600)) 小时前" }
-    return "$([int]($seconds / 86400)) 天前"
+    if ($seconds -lt 0) { return $T.fresh }
+    if ($seconds -lt 60) { return ($T.seconds -f $seconds) }
+    if ($seconds -lt 3600) { return ($T.minutes -f [int]($seconds / 60)) }
+    if ($seconds -lt 86400) { return ($T.hours -f [int]($seconds / 3600)) }
+    return ($T.days -f [int]($seconds / 86400))
 }
 
 # ---------------------------------------------------------------- 找 Codespace
@@ -104,7 +145,7 @@ if ($Codespace -and (Test-Exists $Gh) -and (Test-Exists $Key)) {
 $tunnel = 'skipped'
 $tunnelDetail = ''
 if ($NoTunnel -or $Quick) {
-    $tunnelDetail = '按 -Quick/-NoTunnel 跳过'
+    $tunnelDetail = $T.dSkipFlag
 } elseif ($Codespace -and (Test-Exists $Gh) -and (Test-Exists $Key)) {
     $proc = $null
     function Probe-Tunnel {
@@ -123,12 +164,12 @@ if ($NoTunnel -or $Quick) {
         }
     }
     if ($proc -and -not $proc.HasExited) { Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue }
-    if ($code -eq 401) { $tunnel = 'Healthy'; $tunnelDetail = '127.0.0.1:3080 → 401（需要 token，正常）' }
-    elseif ($code -eq 200) { $tunnel = 'Healthy'; $tunnelDetail = '127.0.0.1:3080 → 200' }
-    elseif ($code -eq 0) { $tunnel = 'Down'; $tunnelDetail = '127.0.0.1:3080 没通' }
-    else { $tunnel = 'Degraded'; $tunnelDetail = "返回 $code" }
+    if ($code -eq 401) { $tunnel = 'Healthy'; $tunnelDetail = $T.d401 }
+    elseif ($code -eq 200) { $tunnel = 'Healthy'; $tunnelDetail = $T.d200 }
+    elseif ($code -eq 0) { $tunnel = 'Down'; $tunnelDetail = $T.dNoTunnel }
+    else { $tunnel = 'Degraded'; $tunnelDetail = ($T.dCode -f $code) }
 } else {
-    $tunnelDetail = '跳过（缺 gh / 密钥 / Codespace）'
+    $tunnelDetail = $T.dSkipMissing
 }
 
 $dshHttp = $cloud['dsh_http']
@@ -200,21 +241,22 @@ function Row([string]$name, [string]$state, [string]$detail) {
 Write-Host ''
 Write-Host ('╭' + ('─' * ($W - 2)) + '╮') -ForegroundColor DarkCyan
 Rule "dsh-codespaces status" "v$KitVersion"
-Rule 'codespace' $(if ($Codespace) { $Codespace } else { '（没有）' })
+Rule $T.codespace $(if ($Codespace) { $Codespace } else { $T.noCodespace })
 Write-Host ('╰' + ('─' * ($W - 2)) + '╯') -ForegroundColor DarkCyan
 Write-Host ''
 
-if ($Codespace) { Row 'Codespace' $(if ($state -and $state -ne 'Available') { 'Starting' } else { 'Running' }) "$Codespace$(if ($state) { "（$state）" })" }
-else { Row 'Codespace' 'Down' '没有可用的 Codespace' }
-Row 'Tunnel' $(if ($tunnel -eq 'skipped') { 'Skipped' } else { $tunnel }) $tunnelDetail
-Row 'DSH' $dshState "$($cloud['dsh_version'])$(if ($cloud['dsh_pid']) { " · pid $($cloud['dsh_pid'])" }) · HTTP $dshHttp"
-Row 'Auto sync' $syncState "$($cloud['mode']) · $(if ($cloud['enabled'] -eq 'off') { 'paused' } else { 'on' })$(if ($cloud['daemon_pids']) { " · daemon pid $($cloud['daemon_pids'])" }) · 静默 $($cloud['idle'])s · 折叠 $($cloud['squash'])s"
-Row 'Last check' '' (Format-Age $cloud['last_check_epoch'])
-Row 'Last push' '' "$(Format-Age $cloud['last_push_epoch'])$(if ($cloud['last_push_subject']) { " · $($cloud['last_push_subject'])" })"
-Row 'Last commit' '' "$($cloud['head_sha']) · $(Format-Age $cloud['head_epoch']) · $($cloud['head_subject'])"
-Row 'Pending files' '' "$($cloud['pending'])$(if ($cloud['pending_files']) { " ($($cloud['pending_files']))" })"
-Row 'In sync' '' "$($cloud['in_sync'])（本地 $($cloud['head_sha']) / 远端 $($cloud['remote_sha'])）"
+$open = $T.paren.o; $close = $T.paren.c
+if ($Codespace) { Row $T.lCodespace $(if ($state -and $state -ne 'Available') { $T.sStarting } else { $T.sRunning }) "$Codespace$(if ($state) { "$open$state$close" })" }
+else { Row $T.lCodespace $T.sDown $T.noCodespace }
+Row $T.lTunnel $(if ($tunnel -eq 'skipped') { $T.sSkipped } else { $tunnel }) $tunnelDetail
+Row $T.lDsh $dshState "$($cloud['dsh_version'])$(if ($cloud['dsh_pid']) { " · pid $($cloud['dsh_pid'])" }) · HTTP $dshHttp"
+Row $T.lSync $syncState "$($cloud['mode']) · $(if ($cloud['enabled'] -eq 'off') { $T.paused } else { $T.on })$(if ($cloud['daemon_pids']) { " · $($T.daemon) $($cloud['daemon_pids'])" }) · $($T.idle) $($cloud['idle'])s · $($T.fold) $($cloud['squash'])s"
+Row $T.lCheck '' (Format-Age $cloud['last_check_epoch'])
+Row $T.lPush '' "$(Format-Age $cloud['last_push_epoch'])$(if ($cloud['last_push_subject']) { " · $($cloud['last_push_subject'])" })"
+Row $T.lCommit '' "$($cloud['head_sha']) · $(Format-Age $cloud['head_epoch']) · $($cloud['head_subject'])"
+Row $T.lPending '' "$($cloud['pending'])$(if ($cloud['pending_files']) { " ($($cloud['pending_files']))" })"
+Row $T.lInSync '' "$($cloud['in_sync']) $open$($T.local) $($cloud['head_sha']) / $($T.remote) $($cloud['remote_sha'])$close"
 if ($cloud['push_failures'] -and $cloud['push_failures'] -ne '0') {
-    Write-Host "  ! 日志里有 $($cloud['push_failures']) 次 push FAILED（tail -n 40 ~/dsh-sync.log 看看）" -ForegroundColor Yellow
+    Write-Host ("  ! " + ($T.failures -f $cloud['push_failures'])) -ForegroundColor Yellow
 }
 Write-Host ''

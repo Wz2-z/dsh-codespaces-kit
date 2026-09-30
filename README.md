@@ -4,7 +4,7 @@
 
 在云端跑官方 dsh，本机只负责开一条 SSH 隧道 —— 成果自动备份到你自己的私有仓库。
 
-版本 [`v1.0.0`](CHANGELOG.md) · 一键安装脚本在 [`install/`](install/)
+版本 [`v1.7.0`](CHANGELOG.md) · 一键安装脚本在 [`install/`](install/) · 控制台支持中文 / English 切换
 
 | | |
 | --- | --- |
@@ -238,7 +238,7 @@ dsh-codespaces uninstall   卸载 / 撤销（默认只预览，要 -Yes + 范围
 
 ```
 ╭──────────────────────────────────────────────────────────────────╮
-│ dsh-codespaces status                                     v1.5.1 │
+│ dsh-codespaces status                                     v1.7.0 │
 │ codespace                     your-codespace-name-here-gxq9gv9gx │
 ╰──────────────────────────────────────────────────────────────────╯
 

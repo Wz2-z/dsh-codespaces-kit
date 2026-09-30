@@ -27,10 +27,11 @@ param(
     [string]$Key,
     [string]$Base,
     [string]$Gh,
-    [string]$GhConfig
+    [string]$GhConfig,
+    [ValidateSet('zh', 'en')][string]$Lang = 'zh'
 )
 $ErrorActionPreference = 'Continue'
-$KitVersion = '1.6.0'
+$KitVersion = '1.7.0'
 $CloudUninstallUrl = 'https://raw.githubusercontent.com/Wz2-z/dsh-codespaces-kit/main/install/cloud-uninstall.sh'
 try { [Console]::OutputEncoding = [Text.Encoding]::UTF8 } catch {}
 try { $OutputEncoding = [Text.Encoding]::UTF8 } catch {}

@@ -31,7 +31,7 @@ Arguments are passed straight through to the matching `*.ps1` / `*.sh`.
 
 ```
 ╭──────────────────────────────────────────────────────────────────╮
-│ dsh-codespaces status                                     v1.5.1 │
+│ dsh-codespaces status                                     v1.7.0 │
 │ codespace                     your-codespace-name-here-gxq9gv9gx │
 ╰──────────────────────────────────────────────────────────────────╯
 

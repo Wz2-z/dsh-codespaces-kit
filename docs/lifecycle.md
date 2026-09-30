@@ -33,7 +33,7 @@ Windows 用 `install\dsh-codespaces.bat <命令>`，macOS/Linux 用 `install/dsh
 
 ```
 ╭──────────────────────────────────────────────────────────────────╮
-│ dsh-codespaces status                                     v1.5.1 │
+│ dsh-codespaces status                                     v1.7.0 │
 │ codespace                     fluffy-space-meme-gxq9gv9gx4g63gvj │
 ╰──────────────────────────────────────────────────────────────────╯
 
