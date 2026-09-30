@@ -2,7 +2,7 @@
 
 > [English version](../en/troubleshooting.md)
 
-> [← 回到 README](../../README.md) · 其他平台：[Windows](windows.md) / [SSH](ssh.md) / [dsh](dsh.md)
+> [← 回到 README](https://github.com/Wz2-z/dsh-codespaces-kit/blob/main/README.md) · 其他平台：[Windows](windows.md) / [SSH](ssh.md) / [dsh](dsh.md)
 
 ## GitHub 的端口转发地址打不开 dsh
 
@@ -35,7 +35,7 @@ dsh web authentication required; reopen the URL printed by dsh web.
 - 不用的时候去 <https://github.com/codespaces> 点 **Stop**
 - 闲置时间改长一点（<https://github.com/settings/codespaces> → Default idle timeout）
 - 用了多少额度：<https://github.com/settings/billing> 里的 Codespaces 一节，或装
-  [`dsh-codespace-panel`](../../plugins/dsh-codespace-panel/) 插件在侧边栏直接看
+  [`dsh-codespace-panel`](https://github.com/Wz2-z/dsh-codespaces-kit/tree/main/plugins/dsh-codespace-panel) 插件在侧边栏直接看
 
 ## `pkill -f "dsh web"` 把自己杀掉了
 

@@ -1,4 +1,4 @@
-> [← 回到 README](../README.md)
+> [← 回到 README](https://github.com/Wz2-z/dsh-codespaces-kit/blob/main/README.md)
 >
 > 把下面**整段**复制给 AI（Codex / dsh / 任何 coding agent 都行）。
 > 复制前先把 `<...>` 占位符换成你自己的信息。
@@ -73,4 +73,4 @@ C. 验证并告诉我结果
 
 ---
 
-[← 回到 README](../README.md)
+[← 回到 README](https://github.com/Wz2-z/dsh-codespaces-kit/blob/main/README.md)

@@ -2,7 +2,7 @@
 
 > [English version](../en/troubleshooting.md)
 
-> [← 回到 README](../../README.md) · 其他平台：[Windows](windows.md) / [SSH](ssh.md) / [Codespaces](codespaces.md)
+> [← 回到 README](https://github.com/Wz2-z/dsh-codespaces-kit/blob/main/README.md) · 其他平台：[Windows](windows.md) / [SSH](ssh.md) / [Codespaces](codespaces.md)
 
 ## 提示 `dsh web authentication required`
 

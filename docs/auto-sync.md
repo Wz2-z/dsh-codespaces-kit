@@ -2,7 +2,7 @@
 
 > [English version](en/auto-sync.md)
 
-> [← 回到 README](../README.md) · 相关：[云端三个脚本](cloud-scripts.md) · [dsh 排错](troubleshooting/dsh.md)
+> [← 回到 README](https://github.com/Wz2-z/dsh-codespaces-kit/blob/main/README.md) · 相关：[云端三个脚本](cloud-scripts.md) · [dsh 排错](troubleshooting/dsh.md)
 
 云端会把工作区的改动 **commit + push** 到你的私有仓库。默认不是"每 5 分钟一个 `auto sync`"，
 而是**等改动停下来**再提交一次 —— 所以 history 里是一条条能看懂的提交，而不是一堵墙。
@@ -82,7 +82,7 @@ bash /workspaces/<repo>/.dsh-cloud/sync.sh --mode=manual
 
 三种看法，随便挑一个：
 
-1. **dsh 侧边栏的同步按钮**（装了 [`dsh-sync-panel`](../plugins/dsh-sync-panel/) 就有）——
+1. **dsh 侧边栏的同步按钮**（装了 [`dsh-sync-panel`](https://github.com/Wz2-z/dsh-codespaces-kit/tree/main/plugins/dsh-sync-panel) 就有）——
    点开就是模式、待提交、最近提交、日志，外加暂停/恢复/立即提交/切模式；
 2. **Windows 桌面快捷方式「dsh 同步」**（`outputs/同步控制台.bat`）—— 菜单式，不用开终端；
 3. **命令行**（最全，容器里的 `sync.sh`）。
@@ -161,4 +161,4 @@ bash tools/squash-autosync.sh --apply --push    # 顺便 force-with-lease 推上
 
 ---
 
-[← 回到 README](../README.md)
+[← 回到 README](https://github.com/Wz2-z/dsh-codespaces-kit/blob/main/README.md)

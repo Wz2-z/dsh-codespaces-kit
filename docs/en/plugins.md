@@ -7,7 +7,7 @@ install only what you can read and understand; try anything uncertain under `rea
 
 ## dsh-codespace-panel (quota + one-click stop)
 
-Full description: [`plugins/dsh-codespace-panel/`](../../plugins/dsh-codespace-panel/).
+Full description: [`plugins/dsh-codespace-panel/`](https://github.com/Wz2-z/dsh-codespaces-kit/tree/main/plugins/dsh-codespace-panel).
 
 ```bash
 # run this inside YOUR Codespace container, not on your computer
@@ -35,7 +35,7 @@ pnpm add ~/dsh-public/plugins/dsh-sync-panel
 # add "dsh-sync-panel" to dsh.profile.bundles
 ```
 
-Details: [`plugins/dsh-sync-panel/`](../../plugins/dsh-sync-panel/).
+Details: [`plugins/dsh-sync-panel/`](https://github.com/Wz2-z/dsh-codespaces-kit/tree/main/plugins/dsh-sync-panel).
 
 ## Three questions before installing any plugin
 

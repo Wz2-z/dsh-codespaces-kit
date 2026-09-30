@@ -8,12 +8,12 @@ title: dsh on GitHub Codespaces
 
 **中文文档**就是这一套页面：从下面开始读。
 
-> **English readers:** start here → **[English docs](en/)** (or the [English README](../README.en.md)).
+> **English readers:** start here → **[English docs](en/)** (or the [English README](https://github.com/Wz2-z/dsh-codespaces-kit/blob/main/README.en.md)).
 
 ## 从这里开始
 
-- [部署指南（主 README）](../README.md) —— 30 秒了解 → 安装 → 配置 → 日常使用
-- [一键安装脚本](../install/) —— `setup.ps1` / `setup.sh`，装完打印 `✅ Installation complete`
+- [部署指南（主 README）](https://github.com/Wz2-z/dsh-codespaces-kit/blob/main/README.md) —— 30 秒了解 → 安装 → 配置 → 日常使用
+- [一键安装脚本](https://github.com/Wz2-z/dsh-codespaces-kit/tree/main/install) —— `setup.ps1` / `setup.sh`，装完打印 `✅ Installation complete`
 - [体检：doctor](doctor.md) —— 12 项检查，坏了看哪一行
 - [生命周期](lifecycle.md) —— `status` / `setup` / `repair` / `update` / `uninstall`
 - [安全模型](security-model.md) —— 创建了哪些 key/token/config，各自能干什么、怎么撤销

@@ -2,7 +2,7 @@
 
 > [English version](../en/troubleshooting.md)
 
-> [← 回到 README](../../README.md) · 其他平台：[Windows](windows.md) / [Codespaces](codespaces.md) / [dsh](dsh.md)
+> [← 回到 README](https://github.com/Wz2-z/dsh-codespaces-kit/blob/main/README.md) · 其他平台：[Windows](windows.md) / [Codespaces](codespaces.md) / [dsh](dsh.md)
 
 这一类问题的共同点：**dsh 本身没事，是本机连不上云端，或者连上了但隧道没建起来。**
 

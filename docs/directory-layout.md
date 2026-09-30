@@ -19,4 +19,4 @@
 
 ---
 
-[← 回到 README](../README.md)
+[← 回到 README](https://github.com/Wz2-z/dsh-codespaces-kit/blob/main/README.md)

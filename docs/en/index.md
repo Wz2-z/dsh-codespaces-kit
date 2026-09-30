@@ -7,12 +7,12 @@ title: dsh on GitHub Codespaces — English
 Run the official DeepSeek Harness (dsh) in a GitHub Codespace, reach it from your own machine through one SSH
 tunnel, and keep the workspace backed up in your own private repo.
 
-> 中文读者：这页的对应中文版在 [docs/](../)（[主 README](../../README.md)）。
+> 中文读者：这页的对应中文版在 [docs/](../)（[主 README](https://github.com/Wz2-z/dsh-codespaces-kit/blob/main/README.md)）。
 
 ## Start here
 
-- [Main README (English)](../../README.en.md) — 30-second overview → install → configure → daily use
-- [One-shot installer](../../install/) — `setup.ps1` / `setup.sh`, ends with `✅ Installation complete`
+- [Main README (English)](https://github.com/Wz2-z/dsh-codespaces-kit/blob/main/README.en.md) — 30-second overview → install → configure → daily use
+- [One-shot installer](https://github.com/Wz2-z/dsh-codespaces-kit/tree/main/install) — `setup.ps1` / `setup.sh`, ends with `✅ Installation complete`
 - [Checkup: doctor](doctor.md) — the 12 checks and what to do when one fails
 - [Lifecycle](lifecycle.md) — `status` / `setup` / `repair` / `update` / `uninstall`
 - [Security model](security-model.md) — every key/token/config this tool creates, what it can do, how to revoke it

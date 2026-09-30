@@ -2,7 +2,7 @@
 
 > [English version](en/security-model.md)
 
-> [← 回到 README](../README.md) · 相关：[生命周期](lifecycle.md) · [doctor](doctor.md)
+> [← 回到 README](https://github.com/Wz2-z/dsh-codespaces-kit/blob/main/README.md) · 相关：[生命周期](lifecycle.md) · [doctor](doctor.md)
 
 一句话：**没有账号级 PAT、没有 GitHub App、没有云厂商账号、没有 sudo 改动。**
 它只在你本机放了两个东西（便携版 gh + 一把 SSH 私钥），在容器里放了一把

@@ -2,14 +2,14 @@
 
 > [English version](en/plugins.md)
 
-> [← 回到 README](../README.md)
+> [← 回到 README](https://github.com/Wz2-z/dsh-codespaces-kit/blob/main/README.md)
 
 dsh 的插件跑在**宿主进程**里，权限等于你的云端账号。所以原则是：
 **来源清楚、能看懂在干什么的才装；不确定的先在 `read-only` 权限下试跑。**
 
 ## dsh-codespace-panel（在侧边栏看额度 + 一键停止）
 
-完整说明见 [`plugins/dsh-codespace-panel/`](../plugins/dsh-codespace-panel/)（含截图、路由、设计约束）。
+完整说明见 [`plugins/dsh-codespace-panel/`](https://github.com/Wz2-z/dsh-codespaces-kit/tree/main/plugins/dsh-codespace-panel)（含截图、路由、设计约束）。
 
 **装法**：在**你自己的 dsh 云端容器**里执行（不是在本地电脑上跑）：
 
@@ -56,7 +56,7 @@ pnpm add ~/dsh-public/plugins/dsh-sync-panel
 # 再把 "dsh-sync-panel" 加进 package.json 的 dsh.profile.bundles
 ```
 
-细节见 [`plugins/dsh-sync-panel/README.md`](../plugins/dsh-sync-panel/README.md)。
+细节见 [`plugins/dsh-sync-panel/README.md`](https://github.com/Wz2-z/dsh-codespaces-kit/blob/main/plugins/dsh-sync-panel/README.md)。
 
 ## 装之前值得问自己的三件事
 

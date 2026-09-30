@@ -2,7 +2,7 @@
 
 > [English version](en/lifecycle.md)
 
-> [← 回到 README](../README.md) · 相关：[安全模型](security-model.md) · [自动同步](auto-sync.md)
+> [← 回到 README](https://github.com/Wz2-z/dsh-codespaces-kit/blob/main/README.md) · 相关：[安全模型](security-model.md) · [自动同步](auto-sync.md)
 
 ```
 dsh-codespaces status      一眼看清现在（几秒，不查隧道时最快）

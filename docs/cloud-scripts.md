@@ -1,4 +1,4 @@
-> [← 回到 README](../README.md)
+> [← 回到 README](https://github.com/Wz2-z/dsh-codespaces-kit/blob/main/README.md)
 >
 > 云端三个脚本的**精简版参考**，用来理解原理或手工修脚本。
 > 实际部署时 AI 会按你的仓库名/路径生成完整版本，不需要手抄。
@@ -74,4 +74,4 @@ fi
 
 ---
 
-[← 回到 README](../README.md)
+[← 回到 README](https://github.com/Wz2-z/dsh-codespaces-kit/blob/main/README.md)

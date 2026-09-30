@@ -1,4 +1,4 @@
-> [← 回到 README](../README.md)
+> [← 回到 README](https://github.com/Wz2-z/dsh-codespaces-kit/blob/main/README.md)
 >
 > 这一页是给 AI 看的执行清单，人不用逐条读。
 > 正常安装时，把[任务书](ai-prompt.md)丢给 AI，它会照着这页做并逐条验收。
@@ -109,4 +109,4 @@ start "dsh tunnel" /min cmd /c ""%DIR%\gh\bin\gh.exe" codespace ports forward 30
 
 ---
 
-[← 回到 README](../README.md)
+[← 回到 README](https://github.com/Wz2-z/dsh-codespaces-kit/blob/main/README.md)
