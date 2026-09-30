@@ -3,6 +3,18 @@
 版本号规则：`MAJOR.MINOR.PATCH`（[语义化版本](https://semver.org/lang/zh-CN/)）。
 发新版时改三处：本文件、[`VERSION`](VERSION)、`install/setup.ps1` 与 `install/setup.sh` 里的 `KIT_VERSION`。
 
+## [1.6.0] - 2026-09-29
+
+英文版 + 文档站（GitHub Pages）。
+
+- **英文文档全套**：`README.en.md` + `docs/en/`（index / doctor / lifecycle / security-model /
+  auto-sync / plugins / troubleshooting / ai-prompt / ai-runbook / macos-linux / directory-layout /
+  cloud-scripts），中文文档顶部都加了 `English version` 链接
+- **GitHub Pages**：<https://wz2-z.github.io/dsh-codespaces-kit/>（中文首页）
+  与 <https://wz2-z.github.io/dsh-codespaces-kit/en/>（English）
+  —— `docs/_config.yml` 里启用 `jekyll-relative-links`，文档之间的相对链接在网页上也能点
+- 中文 `docs/` 与英文 `docs/en/` 保持同样的结构，方便对照
+
 ## [1.5.1] - 2026-09-29
 
 界面统一成"框线 + 颜色"的一套观感（Windows 控制台里也正常，不需要 Windows Terminal）：

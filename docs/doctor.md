@@ -1,5 +1,7 @@
 # dsh-codespaces doctor
 
+> [English version](en/doctor.md)
+
 > [← 回到 README](../README.md) · 相关：[自动同步](auto-sync.md) · [排错手册](troubleshooting/codespaces.md)
 
 装完、换电脑、或者"感觉哪里不对"的时候跑一次：

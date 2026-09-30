@@ -1,5 +1,7 @@
 # 用 GitHub Codespaces 部署 DeepSeek Harness（dsh）
 
+**中文** · [English](README.en.md)
+
 在云端跑官方 dsh，本机只负责开一条 SSH 隧道 —— 成果自动备份到你自己的私有仓库。
 
 版本 [`v1.0.0`](CHANGELOG.md) · 一键安装脚本在 [`install/`](install/)

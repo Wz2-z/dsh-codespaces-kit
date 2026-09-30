@@ -1,5 +1,7 @@
 # dsh 自己的坑
 
+> [English version](../en/troubleshooting.md)
+
 > [← 回到 README](../../README.md) · 其他平台：[Windows](windows.md) / [SSH](ssh.md) / [Codespaces](codespaces.md)
 
 ## 提示 `dsh web authentication required`

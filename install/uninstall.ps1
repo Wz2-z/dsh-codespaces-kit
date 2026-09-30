@@ -30,7 +30,7 @@ param(
     [string]$GhConfig
 )
 $ErrorActionPreference = 'Continue'
-$KitVersion = '1.5.1'
+$KitVersion = '1.6.0'
 $CloudUninstallUrl = 'https://raw.githubusercontent.com/Wz2-z/dsh-codespaces-kit/main/install/cloud-uninstall.sh'
 try { [Console]::OutputEncoding = [Text.Encoding]::UTF8 } catch {}
 try { $OutputEncoding = [Text.Encoding]::UTF8 } catch {}

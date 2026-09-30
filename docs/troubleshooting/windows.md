@@ -1,5 +1,7 @@
 # Windows 上的坑
 
+> [English version](../en/troubleshooting.md)
+
 > [← 回到 README](../../README.md) · 其他平台：[SSH](ssh.md) / [Codespaces](codespaces.md) / [dsh](dsh.md)
 
 ## `.bat` 里的中文变成 `????`

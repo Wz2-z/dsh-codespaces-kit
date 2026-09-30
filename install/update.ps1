@@ -8,7 +8,7 @@ param(
     [switch]$NoOpen
 )
 $ErrorActionPreference = 'Continue'
-$KitVersion = '1.5.1'
+$KitVersion = '1.6.0'
 try { [Console]::OutputEncoding = [Text.Encoding]::UTF8 } catch {}
 try { $OutputEncoding = [Text.Encoding]::UTF8 } catch {}
 function Test-Exists([string]$path) { try { return [bool](Test-Path -LiteralPath $path -ErrorAction Stop) } catch { return $false } }

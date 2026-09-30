@@ -1,5 +1,7 @@
 # 安装安全模型：这套工具到底创建了什么
 
+> [English version](en/security-model.md)
+
 > [← 回到 README](../README.md) · 相关：[生命周期](lifecycle.md) · [doctor](doctor.md)
 
 一句话：**没有账号级 PAT、没有 GitHub App、没有云厂商账号、没有 sudo 改动。**

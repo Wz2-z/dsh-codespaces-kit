@@ -1,5 +1,7 @@
 # 插件
 
+> [English version](en/plugins.md)
+
 > [← 回到 README](../README.md)
 
 dsh 的插件跑在**宿主进程**里，权限等于你的云端账号。所以原则是：

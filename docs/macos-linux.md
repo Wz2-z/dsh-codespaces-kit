@@ -1,5 +1,7 @@
 # 在 macOS / Linux 本机上使用
 
+> [English version](en/macos-linux.md)
+
 ```bash
 brew install gh            # 或 sudo apt install gh
 gh auth login --hostname github.com --git-protocol https --web --scopes codespace,repo,read:org,workflow

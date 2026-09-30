@@ -1,5 +1,7 @@
 # 生命周期：status / doctor / setup / repair / update / uninstall
 
+> [English version](en/lifecycle.md)
+
 > [← 回到 README](../README.md) · 相关：[安全模型](security-model.md) · [自动同步](auto-sync.md)
 
 ```

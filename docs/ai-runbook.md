@@ -5,6 +5,8 @@
 
 # 技术细节（AI 执行清单）
 
+> [English version](en/ai-runbook.md)
+
 ## 1. 云端做这些
 
 在 Codespace 的终端里（或在 AI 通过 SSH 连接后）：

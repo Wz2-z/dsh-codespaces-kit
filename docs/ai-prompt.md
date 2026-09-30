@@ -5,6 +5,8 @@
 
 # 给 AI 的任务书
 
+> [English version](en/ai-prompt.md)
+
 ```text
 我要用 GitHub Codespaces 在云端部署 DeepSeek Harness（dsh），请帮我配置好云端和本机。
 

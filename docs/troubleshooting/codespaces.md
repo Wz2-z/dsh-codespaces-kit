@@ -1,5 +1,7 @@
 # Codespaces 上的坑
 
+> [English version](../en/troubleshooting.md)
+
 > [← 回到 README](../../README.md) · 其他平台：[Windows](windows.md) / [SSH](ssh.md) / [dsh](dsh.md)
 
 ## GitHub 的端口转发地址打不开 dsh

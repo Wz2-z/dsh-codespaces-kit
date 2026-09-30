@@ -1,5 +1,7 @@
 # 目录结构
 
+> [English version](en/directory-layout.md)
+
 ```
 本机（Windows）
 ├── Desktop\DeepSeek Harness.lnk          启动

@@ -1,0 +1,13 @@
+title: dsh on GitHub Codespaces
+description: Run the official DeepSeek Harness (dsh) in a GitHub Codespace — SSH tunnel to your machine, workspace backed by your own private repo.
+theme: jekyll-theme-cayman
+
+# 让 Markdown 里的相对链接（doctor.md 这种）在 Pages 上也能点开
+plugins:
+  - jekyll-relative-links
+relative_links:
+  enabled: true
+  collections: false
+
+exclude:
+  - "*.sh"

@@ -22,7 +22,7 @@ param(
     [switch]$Json
 )
 $ErrorActionPreference = 'Continue'
-$KitVersion = '1.5.1'
+$KitVersion = '1.6.0'
 $CloudDoctorUrl = 'https://raw.githubusercontent.com/Wz2-z/dsh-codespaces-kit/main/install/cloud-doctor.sh'
 try { [Console]::OutputEncoding = [Text.Encoding]::UTF8 } catch {}
 try { $OutputEncoding = [Text.Encoding]::UTF8 } catch {}

@@ -1,5 +1,7 @@
 # 自动同步（智能批量）
 
+> [English version](en/auto-sync.md)
+
 > [← 回到 README](../README.md) · 相关：[云端三个脚本](cloud-scripts.md) · [dsh 排错](troubleshooting/dsh.md)
 
 云端会把工作区的改动 **commit + push** 到你的私有仓库。默认不是"每 5 分钟一个 `auto sync`"，
